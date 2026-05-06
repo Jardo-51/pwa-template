@@ -24,6 +24,6 @@
   const theme = useTheme()
 
   watch(() => app.darkMode, (dark) => {
-    theme.global.name.value = dark ? 'dark' : 'light'
+    theme.change(dark ? 'dark' : 'light')
   }, { immediate: true })
 </script>
