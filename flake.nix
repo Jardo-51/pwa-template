@@ -1,8 +1,8 @@
 {
-  description = "Vue.js PWA template dev environment with pnpm";
+  description = "Vue.js app dev environment with pnpm";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
   outputs = { self, nixpkgs }:
@@ -14,7 +14,7 @@
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
           pkgs.nodejs
-          pkgs.nodePackages.pnpm
+          pkgs.pnpm
         ];
 
         shellHook = ''
@@ -27,7 +27,7 @@
       playwright = pkgs.mkShell {
         buildInputs = [
           pkgs.nodejs
-          pkgs.nodePackages.pnpm
+          pkgs.pnpm
         ];
         nativeBuildInputs = with pkgs; [ playwright-driver.browsers ];
         shellHook = ''
