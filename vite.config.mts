@@ -2,8 +2,8 @@ import { fileURLToPath, URL } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
 import Fonts from 'unplugin-fonts/vite'
 import { defineConfig } from 'vite'
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineConfig({
   plugins: [
@@ -69,7 +69,7 @@ export default defineConfig({
       enforce: 'post',
       transformIndexHtml: {
         order: 'post',
-        handler: (html) => html.replace(/\s*<link[^>]+materialdesignicons[^>]+>/g, ''),
+        handler: html => html.replace(/\s*<link[^>]+materialdesignicons[^>]+>/g, ''),
       },
     },
   ],

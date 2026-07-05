@@ -7,13 +7,13 @@ export const useAppStore = defineStore('app', () => {
   const snackbarColor = ref('success')
   const darkMode = ref(localStorage.getItem('darkMode') === 'true')
 
-  function showSnackbar(text: string, color = 'success') {
+  function showSnackbar (text: string, color = 'success') {
     snackbarText.value = text
     snackbarColor.value = color
     snackbar.value = true
   }
 
-  function toggleDarkMode() {
+  function toggleDarkMode () {
     darkMode.value = !darkMode.value
     localStorage.setItem('darkMode', String(darkMode.value))
   }

@@ -3,7 +3,9 @@
     <v-main class="pb-16">
       <router-view />
     </v-main>
+
     <AppBottomNav />
+
     <v-snackbar
       v-model="app.snackbar"
       :color="app.snackbarColor"
@@ -23,7 +25,7 @@
   const app = useAppStore()
   const theme = useTheme()
 
-  watch(() => app.darkMode, (dark) => {
+  watch(() => app.darkMode, dark => {
     theme.change(dark ? 'dark' : 'light')
   }, { immediate: true })
 </script>
