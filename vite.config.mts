@@ -1,6 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
-import Fonts from 'unplugin-fonts/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
@@ -16,21 +15,29 @@ export default defineConfig({
         configFile: 'src/styles/settings.scss',
       },
     }),
-    Fonts({
-      fontsource: {
-        families: [
-          {
-            name: 'Roboto',
-            weights: [100, 300, 400, 500, 700, 900],
-            styles: ['normal', 'italic'],
-          },
-        ],
-      },
-    }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}', '**/materialdesignicons*.woff2'],
+        // The MDI icon webfont is precached so glyphs render offline on the
+        // very first visit (the bottom nav shows icons on every page). Roboto
+        // text weights are cached on demand (CacheFirst) instead, so only the
+        // weights/subsets a visitor actually renders get stored — and every SW
+        // update no longer re-downloads the whole font payload.
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.destination === 'font',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'PWA App',
@@ -60,18 +67,6 @@ export default defineConfig({
         ],
       },
     }),
-    // unplugin-fonts scans CSS for @font-face and emits a `<link rel=preload>`
-    // for every src URL it finds. The mdi CSS imported in src/plugins/vuetify.ts
-    // declares 4 formats (eot/woff2/woff/ttf), so 4 preloads get emitted but
-    // only one is ever used — browsers warn about the unused ones. Strip them.
-    {
-      name: 'remove-mdi-font-preloads',
-      enforce: 'post',
-      transformIndexHtml: {
-        order: 'post',
-        handler: html => html.replace(/\s*<link[^>]+materialdesignicons[^>]+>/g, ''),
-      },
-    },
   ],
   define: { 'process.env': {} },
   resolve: {

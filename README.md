@@ -53,6 +53,36 @@ src/
 - Full offline functionality via service worker caching
 - Auto-updates when a new version is deployed
 
+## Fonts
+
+Roboto (Vuetify's default typeface) is imported directly in `src/main.ts` via
+[`@fontsource`](https://fontsource.org/), one CSS file per weight:
+
+```ts
+import '@fontsource/roboto/latin-300.css'
+import '@fontsource/roboto/latin-400.css'
+import '@fontsource/roboto/latin-500.css'
+import '@fontsource/roboto/latin-700.css'
+```
+
+Only the **latin subset** and the **300/400/500/700** weights are bundled — the
+minimum Vuetify uses. This keeps the payload small, but has two consequences to
+know when building on the template:
+
+- **Non-latin text falls back to the system font.** For Central European
+  diacritics (č, ő, ș), Cyrillic, Greek, Vietnamese, etc., add the matching
+  subset next to the imports above, e.g. `import '@fontsource/roboto/latin-ext-400.css'`
+  or `import '@fontsource/roboto/cyrillic-400.css'`.
+- **Extra weights/styles need their own import.** Using Roboto 100/900 or
+  italics? Add e.g. `import '@fontsource/roboto/latin-900.css'` /
+  `latin-400-italic.css`. To swap in a different typeface entirely, install its
+  `@fontsource` package, import it here, and point Vuetify's font at it.
+
+Fonts are cached on demand by the service worker (`CacheFirst`) rather than
+precached, so only the weights a visitor actually renders get stored. The one
+exception is the Material Design Icons webfont, which is precached so icons
+render offline even on the very first visit.
+
 ## Dark Mode
 
 - Toggle between light and dark themes from settings
