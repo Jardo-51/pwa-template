@@ -5,7 +5,15 @@ export const useAppStore = defineStore('app', () => {
   const snackbar = ref(false)
   const snackbarText = ref('')
   const snackbarColor = ref('success')
-  const darkMode = ref(localStorage.getItem('darkMode') === 'true')
+  // Honour the user's explicit choice when set; otherwise fall back to the OS
+  // colour-scheme preference so a system-wide dark setting doesn't get a white
+  // flash-bang on first launch.
+  const storedDarkMode = localStorage.getItem('darkMode')
+  const darkMode = ref(
+    storedDarkMode === null
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : storedDarkMode === 'true',
+  )
 
   function showSnackbar (text: string, color = 'success') {
     snackbarText.value = text

@@ -51,7 +51,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `public/.htaccess` pins hashed assets and `sw.js`, but the HTML shell gets no `Cache-Control`, so browsers apply heuristic caching (a fraction of the `Last-Modified` age). Clients not yet controlled by the SW (first visits, users who cleared the SW) can receive a stale `index.html` referencing asset hashes; today rsync-without-delete masks this (see finding 12), but the two settings should not depend on each other.
   **Fix:** add `no-cache` (or `max-age=0, must-revalidate`) headers for `index.html` and `manifest.webmanifest`.
 
-- [ ] **7. (MEDIUM)** Dark mode ignores the OS preference — first launch is always light.
+- [x] **7. (MEDIUM)** Dark mode ignores the OS preference — first launch is always light.
   `src/stores/app.ts:8` defaults to light whenever `localStorage` is unset, and `src/plugins/vuetify.ts:7` sets `defaultTheme: 'light'`. Users with a system-wide dark preference get a white flash-bang on install.
   **Fix:** fall back to `window.matchMedia('(prefers-color-scheme: dark)').matches` when the localStorage key is absent (or restructure around Vuetify's `'system'` theme and store an explicit light/dark/system tri-state).
 
