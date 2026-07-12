@@ -30,7 +30,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `vite.config.mts:33` globs `**/*.woff2`, so all 96 Roboto subsets (~2 MB) plus the 400 KB full MDI webfont are precached on first visit and re-validated on every SW update. Build output confirms: `precache 113 entries (2789.90 KiB)`.
   **Fix:** fix finding 1 first (fewer files to glob), and consider removing `woff2` from `globPatterns` in favor of a `runtimeCaching` rule (`CacheFirst`, long expiration) for fonts so only fonts actually used get cached. With findings 1 + 4 addressed, keeping woff2 in the precache glob becomes fine.
 
-- [ ] **3. (HIGH)** No catch-all route — any unknown URL renders a blank page.
+- [x] **3. (HIGH)** No catch-all route — any unknown URL renders a blank page.
   `src/router/index.ts:5-14` defines only `/` and `/settings`. Because the SPA rewrite (`.htaccess`) and the workbox `navigateFallback` serve `index.html` for every path, any typo'd, stale, or externally shared deep link mounts the app with an empty `<router-view>` and only a console warning.
   **Fix:** add a `{ path: '/:pathMatch(.*)*', ... }` route rendering a NotFound page (or redirecting to `/`).
 
