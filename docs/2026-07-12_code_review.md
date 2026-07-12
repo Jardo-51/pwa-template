@@ -39,6 +39,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 - [ ] **4. (MEDIUM)** Full MDI webfont (400 KB woff2, 3.5 MB across formats in dist) shipped for the 2 icons the template uses.
   `src/plugins/vuetify.ts:2` imports `@mdi/font`, which ships the complete ~7000-icon font in eot/ttf/woff/woff2 (all four end up in `dist/assets/`).
   **Fix:** switch to `@mdi/js` + the `mdi-svg` iconset (tree-shakable — only imported icon paths are bundled). Removes ~400 KB from the precache and all four font files from dist.
+  **Note:** when this lands, also drop the `**/materialdesignicons*.woff2` entry from the workbox `globPatterns` in `vite.config.mts` (added in 045b3fd to precache the icon font) — it becomes a dead glob once the webfont is gone.
 
 - [ ] **5. (MEDIUM)** `registerSW.js` is cached as immutable for 1 year despite not being content-hashed.
   `public/.htaccess:1-3` applies `max-age=31536000, immutable` to all `.js` files, but vite-plugin-pwa emits `dist/registerSW.js` with a stable name. If a plugin upgrade or config change (SW filename, scope, base) alters its content, existing visitors keep the stale registration script for up to a year.
