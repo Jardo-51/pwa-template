@@ -1,6 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
 import Vue from '@vitejs/plugin-vue'
-import Fonts from 'unplugin-fonts/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
@@ -14,17 +13,6 @@ export default defineConfig({
       autoImport: true,
       styles: {
         configFile: 'src/styles/settings.scss',
-      },
-    }),
-    Fonts({
-      fontsource: {
-        families: [
-          {
-            name: 'Roboto',
-            weights: [100, 300, 400, 500, 700, 900],
-            styles: ['normal', 'italic'],
-          },
-        ],
       },
     }),
     VitePWA({
@@ -60,18 +48,6 @@ export default defineConfig({
         ],
       },
     }),
-    // unplugin-fonts scans CSS for @font-face and emits a `<link rel=preload>`
-    // for every src URL it finds. The mdi CSS imported in src/plugins/vuetify.ts
-    // declares 4 formats (eot/woff2/woff/ttf), so 4 preloads get emitted but
-    // only one is ever used — browsers warn about the unused ones. Strip them.
-    {
-      name: 'remove-mdi-font-preloads',
-      enforce: 'post',
-      transformIndexHtml: {
-        order: 'post',
-        handler: html => html.replace(/\s*<link[^>]+materialdesignicons[^>]+>/g, ''),
-      },
-    },
   ],
   define: { 'process.env': {} },
   resolve: {

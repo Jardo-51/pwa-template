@@ -22,7 +22,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 ## HIGH
 
-- [ ] **1. (HIGH)** Every Roboto subset is preloaded in both woff2 and woff — ~4 MB of fonts forced onto first page load.
+- [x] **1. (HIGH)** Every Roboto subset is preloaded in both woff2 and woff — ~4 MB of fonts forced onto first page load.
   `vite.config.mts:19-29` requests 6 weights × 2 styles from fontsource; each variant ships 8 unicode-range subsets (latin, latin-ext, cyrillic, cyrillic-ext, greek, greek-ext, vietnamese, symbols…), producing 96 woff2 files in `dist`. `unplugin-fonts` then injects a `<link rel="preload" as="font">` for **every** `src` URL — measured in the built `index.html`: 96 woff2 + 96 woff = **192 preloads** (the built index.html is 26 KB of mostly preload tags). `rel=preload` downloads immediately and unconditionally, defeating the `unicode-range` lazy-subset mechanism, and the woff copies are pure waste since every browser that runs Vue 3 supports woff2.
   **Fix:** drop the `Fonts()` plugin (and the `import 'unfonts.css'` in `src/main.ts:17`) and instead import only what's used directly in `main.ts`, e.g. `import '@fontsource/roboto/latin-300.css'` / `latin-400` / `latin-500` / `latin-700` (`@fontsource/roboto` is already a direct dependency). This also makes the `remove-mdi-font-preloads` workaround plugin (`vite.config.mts:67-74`) unnecessary. If you keep `unplugin-fonts`, at minimum trim `weights` to `[300, 400, 500, 700]` and drop `italic`.
 
