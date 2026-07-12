@@ -55,7 +55,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `src/stores/app.ts:8` defaults to light whenever `localStorage` is unset, and `src/plugins/vuetify.ts:7` sets `defaultTheme: 'light'`. Users with a system-wide dark preference get a white flash-bang on install.
   **Fix:** fall back to `window.matchMedia('(prefers-color-scheme: dark)').matches` when the localStorage key is absent (or restructure around Vuetify's `'system'` theme and store an explicit light/dark/system tri-state).
 
-- [ ] **8. (MEDIUM)** Consecutive snackbar messages can vanish almost immediately — the timeout is never reset.
+- [x] **8. (MEDIUM)** Consecutive snackbar messages can vanish almost immediately — the timeout is never reset.
   `src/stores/app.ts:10-14` sets `snackbar.value = true` while it may already be `true`; Vuetify's `VSnackbar` starts its `:timeout` (`src/App.vue:12`) only on the `false → true` transition, so a second `showSnackbar()` call replaces the text but inherits the first message's nearly expired timer.
   **Fix:** in `showSnackbar`, set `snackbar.value = false` then re-open on `nextTick()` (or maintain a message queue).
 
