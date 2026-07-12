@@ -8,6 +8,23 @@
     Header set Expires "0"
 </Files>
 
+# registerSW.js has a stable (non-hashed) name, so it must not inherit the
+# 1-year immutable policy above — a plugin/config change to its contents must
+# reach existing visitors.
+<Files "registerSW.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</Files>
+
+# The HTML shell and manifest are unhashed and reference hashed assets, so they
+# must always be revalidated rather than served from heuristic cache.
+<FilesMatch "^(index\.html|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>
+
 Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self';"
 Header set X-Content-Type-Options "nosniff"
 Header set X-Frame-Options "DENY"
