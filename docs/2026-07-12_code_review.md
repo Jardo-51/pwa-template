@@ -59,7 +59,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `src/stores/app.ts:10-14` sets `snackbar.value = true` while it may already be `true`; Vuetify's `VSnackbar` starts its `:timeout` (`src/App.vue:12`) only on the `false → true` transition, so a second `showSnackbar()` call replaces the text but inherits the first message's nearly expired timer.
   **Fix:** in `showSnackbar`, set `snackbar.value = false` then re-open on `nextTick()` (or maintain a message queue).
 
-- [ ] **9. (MEDIUM)** Manifest icon declares `purpose: 'any maskable'` on a non-maskable image.
+- [x] **9. (MEDIUM)** Manifest icon declares `purpose: 'any maskable'` on a non-maskable image.
   `vite.config.mts:54-59` reuses the plain 512×512 icon for both purposes. Maskable icons need the safe-zone padding (icon content within the inner 80%); a shared image either gets cropped on Android launchers or looks undersized elsewhere. Lighthouse flags combined `any maskable` for this reason.
   **Fix:** add a dedicated padded `pwa-maskable-512x512.png` with `purpose: 'maskable'` and keep the existing icons as `purpose: 'any'`.
 
