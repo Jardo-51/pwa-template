@@ -63,7 +63,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `vite.config.mts:54-59` reuses the plain 512×512 icon for both purposes. Maskable icons need the safe-zone padding (icon content within the inner 80%); a shared image either gets cropped on Android launchers or looks undersized elsewhere. Lighthouse flags combined `any maskable` for this reason.
   **Fix:** add a dedicated padded `pwa-maskable-512x512.png` with `purpose: 'maskable'` and keep the existing icons as `purpose: 'any'`.
 
-- [ ] **10. (MEDIUM)** GitHub workflows don't restrict `GITHUB_TOKEN` permissions.
+- [x] **10. (MEDIUM)** GitHub workflows don't restrict `GITHUB_TOKEN` permissions.
   Neither `.github/workflows/build.yml` nor `deploy.yml` declares a `permissions:` block, so jobs inherit the repo/org default, which may be read-write. Neither job needs more than `contents: read`.
   **Fix:** add `permissions: contents: read` at the workflow level in both files.
 
