@@ -67,7 +67,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   Neither `.github/workflows/build.yml` nor `deploy.yml` declares a `permissions:` block, so jobs inherit the repo/org default, which may be read-write. Neither job needs more than `contents: read`.
   **Fix:** add `permissions: contents: read` at the workflow level in both files.
 
-- [ ] **11. (MEDIUM)** CI never runs ESLint — only type-check + build.
+- [x] **11. (MEDIUM)** CI never runs ESLint — only type-check + build.
   `.github/workflows/build.yml:27-32` runs `pnpm build` (which includes `type-check`), but `pnpm lint` is never executed, so lint regressions land silently.
   **Fix:** add `pnpm lint` to the build step (or a parallel job).
 
