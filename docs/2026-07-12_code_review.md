@@ -79,7 +79,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `flake.nix:26-36` defines `outputs.playwright` at the top level rather than under `devShells.${system}`. `nix flake check`/`nix flake show` flag it as an unknown output, and `nix develop .#playwright` only resolves through the literal-attrpath fallback rather than the documented shell lookup.
   **Fix:** move it to `devShells.${system}.playwright`.
 
-- [ ] **14. (MEDIUM)** `resolve.extensions` includes `.vue`, which Vite explicitly recommends against.
+- [x] **14. (MEDIUM)** `resolve.extensions` includes `.vue`, which Vite explicitly recommends against.
   `vite.config.mts:81-89` re-declares the default extension list plus `.vue`. Allowing extension-less `.vue` imports breaks IDE/type tooling (vue-tsc and Volar expect explicit `.vue` extensions, which the codebase already uses everywhere).
   **Fix:** delete the `extensions` array entirely (the defaults suffice).
 
