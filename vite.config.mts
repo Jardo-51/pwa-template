@@ -18,10 +18,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        // Fonts are cached on demand (CacheFirst) rather than precached, so
-        // only the weights/subsets a visitor actually renders get stored —
-        // and every SW update no longer re-downloads the whole font payload.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}', '**/materialdesignicons*.woff2'],
+        // The MDI icon webfont is precached so glyphs render offline on the
+        // very first visit (the bottom nav shows icons on every page). Roboto
+        // text weights are cached on demand (CacheFirst) instead, so only the
+        // weights/subsets a visitor actually renders get stored — and every SW
+        // update no longer re-downloads the whole font payload.
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'font',
