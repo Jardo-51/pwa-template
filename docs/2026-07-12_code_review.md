@@ -75,7 +75,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `deploy.yml:51` runs `rsync -crvz` without `--delete`. Every deploy layers new hashed assets over all previous ones; over time the doc root fills with dead JS/CSS/fonts, and removed files (e.g. an old page pre-rendered file) remain publicly served. Keeping one previous generation of assets is a legitimate strategy for open tabs, but unbounded accumulation isn't.
   **Fix:** if intentional, document it in the README and add a periodic cleanup; otherwise add `--delete` (safe here because the SW precaches everything the old clients need, and finding 6's no-cache HTML prevents stale-shell 404s).
 
-- [ ] **13. (MEDIUM)** `playwright` dev shell sits outside the standard flake output schema.
+- [x] **13. (MEDIUM)** `playwright` dev shell sits outside the standard flake output schema.
   `flake.nix:26-36` defines `outputs.playwright` at the top level rather than under `devShells.${system}`. `nix flake check`/`nix flake show` flag it as an unknown output, and `nix develop .#playwright` only resolves through the literal-attrpath fallback rather than the documented shell lookup.
   **Fix:** move it to `devShells.${system}.playwright`.
 
