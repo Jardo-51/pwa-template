@@ -23,7 +23,6 @@
         '';
       };
 
-      # Note: The playwright shell has not been tested yet.
       playwright = pkgs.mkShell {
         buildInputs = [
           pkgs.nodejs
