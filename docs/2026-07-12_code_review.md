@@ -36,7 +36,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 ## MEDIUM
 
-- [ ] **4. (MEDIUM)** Full MDI webfont (400 KB woff2, 3.5 MB across formats in dist) shipped for the 2 icons the template uses.
+- [x] **4. (MEDIUM)** Full MDI webfont (400 KB woff2, 3.5 MB across formats in dist) shipped for the 2 icons the template uses.
   `src/plugins/vuetify.ts:2` imports `@mdi/font`, which ships the complete ~7000-icon font in eot/ttf/woff/woff2 (all four end up in `dist/assets/`).
   **Fix:** switch to `@mdi/js` + the `mdi-svg` iconset (tree-shakable — only imported icon paths are bundled). Removes ~400 KB from the precache and all four font files from dist.
   **Note:** when this lands, also drop the `**/materialdesignicons*.woff2` entry from the workbox `globPatterns` in `vite.config.mts` (added in 045b3fd to precache the icon font) — it becomes a dead glob once the webfont is gone.

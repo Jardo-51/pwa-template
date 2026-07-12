@@ -79,9 +79,34 @@ know when building on the template:
   `@fontsource` package, import it here, and point Vuetify's font at it.
 
 Fonts are cached on demand by the service worker (`CacheFirst`) rather than
-precached, so only the weights a visitor actually renders get stored. The one
-exception is the Material Design Icons webfont, which is precached so icons
-render offline even on the very first visit.
+precached, so only the weights a visitor actually renders get stored.
+
+## Icons
+
+Material Design Icons are used via [`@mdi/js`](https://www.npmjs.com/package/@mdi/js)
+with Vuetify's tree-shakable `mdi-svg` iconset (configured in
+`src/plugins/vuetify.ts`) — **not** the full `@mdi/font` webfont. Only the icons
+you import are bundled (as inline SVG paths), so there is no ~7000-icon,
+multi-format font payload to ship or precache.
+
+The tradeoff is the workflow: import each icon by name and pass it as a value
+rather than using the `mdi-xxx` string form.
+
+```vue
+<script setup lang="ts">
+  import { mdiHome } from '@mdi/js'
+</script>
+
+<template>
+  <v-icon :icon="mdiHome" />       <!-- ✅ imported path -->
+  <v-icon>mdi-home</v-icon>        <!-- ❌ renders nothing with the svg set -->
+</template>
+```
+
+Vuetify's own built-in UI icons (checkbox checks, dropdown chevrons, close
+buttons, …) keep working because `aliases` from the iconset is registered. Raw
+font usage outside Vuetify (`<i class="mdi mdi-home">`, CSS `content: '\FXXXX'`)
+is **not** available, since the `@mdi/font` stylesheet is no longer loaded.
 
 ## Dark Mode
 
