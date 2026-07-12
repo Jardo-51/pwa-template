@@ -71,7 +71,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
   `.github/workflows/build.yml:27-32` runs `pnpm build` (which includes `type-check`), but `pnpm lint` is never executed, so lint regressions land silently.
   **Fix:** add `pnpm lint` to the build step (or a parallel job).
 
-- [ ] **12. (MEDIUM)** Deploys never delete anything — stale files accumulate on the server forever.
+- [x] **12. (MEDIUM)** Deploys never delete anything — stale files accumulate on the server forever.
   `deploy.yml:51` runs `rsync -crvz` without `--delete`. Every deploy layers new hashed assets over all previous ones; over time the doc root fills with dead JS/CSS/fonts, and removed files (e.g. an old page pre-rendered file) remain publicly served. Keeping one previous generation of assets is a legitimate strategy for open tabs, but unbounded accumulation isn't.
   **Fix:** if intentional, document it in the README and add a periodic cleanup; otherwise add `--delete` (safe here because the SW precaches everything the old clients need, and finding 6's no-cache HTML prevents stale-shell 404s).
 

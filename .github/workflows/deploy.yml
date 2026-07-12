@@ -51,4 +51,4 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -crvz ./dist/ ${{ secrets.DEPLOY_URL }}
+          rsync -crvz --delete ./dist/ ${{ secrets.DEPLOY_URL }}
