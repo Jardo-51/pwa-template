@@ -113,7 +113,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **28. (LOW)** No `concurrency` group in `build.yml` — rapid pushes to the same branch queue redundant builds. Add `concurrency: { group: build-${{ github.ref }}, cancel-in-progress: true }`.
 
-- [ ] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
+- [x] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
 
 - [ ] **30. (LOW)** Stray backticks in comments: `src/main.ts:4` ("mounts the App\`") and `src/styles/settings.scss:7` (URL ends with a backtick, breaking the link when clicked).
 
