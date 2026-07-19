@@ -103,7 +103,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **23. (LOW)** `index.html` lacks a `<meta name="description">`, and the single `theme-color` (`#1976D2`) doesn't adapt to dark mode. Add a description and consider paired `<meta name="theme-color" media="(prefers-color-scheme: …)">` tags.
 
-- [ ] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
+- [x] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
 
 - [ ] **25. (LOW)** `.htaccess` hardening: add `AddType application/manifest+json .webmanifest` (older Apache serves it as `text/plain`), and consider `form-action 'self'` in the CSP. `X-Frame-Options` is redundant next to `frame-ancestors 'none'` but harmless.
 

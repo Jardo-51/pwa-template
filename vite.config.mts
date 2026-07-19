@@ -40,13 +40,17 @@ export default defineConfig({
         ],
       },
       manifest: {
+        // Stable app identity so Chromium keeps the same installed app even if
+        // start_url changes later.
+        id: '/',
         name: 'PWA App',
         short_name: 'App',
         description: 'A Progressive Web App',
         theme_color: '#1976D2',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
+        // No orientation lock — installed windows follow the device/user. Set
+        // e.g. orientation: 'portrait' per app if a fixed orientation is needed.
         icons: [
           {
             src: 'pwa-192x192.png',
