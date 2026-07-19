@@ -105,7 +105,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
 
-- [ ] **25. (LOW)** `.htaccess` hardening: add `AddType application/manifest+json .webmanifest` (older Apache serves it as `text/plain`), and consider `form-action 'self'` in the CSP. `X-Frame-Options` is redundant next to `frame-ancestors 'none'` but harmless.
+- [x] **25. (LOW)** `.htaccess` hardening: add `AddType application/manifest+json .webmanifest` (older Apache serves it as `text/plain`), and consider `form-action 'self'` in the CSP. `X-Frame-Options` is redundant next to `frame-ancestors 'none'` but harmless.
 
 - [ ] **26. (LOW)** `deploy.yml:44-47` writes the SSH key with the default umask and then `chmod 600`s it — a brief window where the file is 0644. On an ephemeral single-tenant runner this is theoretical; still, `(umask 077; echo "…" > ~/.ssh/id_ed25519)` or `install -m 600` is the cleaner idiom.
 
