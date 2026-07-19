@@ -127,3 +127,9 @@ Required repository secrets for deployment:
 | `DEPLOY_KEY` | SSH private key |
 | `DEPLOY_HOST_KEY` | Known hosts entry for the target server |
 | `DEPLOY_URL` | rsync destination (e.g. `user@host:/var/www/app/`) |
+
+> **Note:** the deploy step runs `rsync` with `--delete`, so anything in the
+> destination directory that isn't part of the build output is removed. If you
+> keep server-managed files there (e.g. `.well-known/acme-challenge/` for
+> Let's Encrypt, a hand-placed `robots.txt`, or host-panel files), point
+> `DEPLOY_URL` at a dedicated docroot or add an `--exclude` for those paths.
