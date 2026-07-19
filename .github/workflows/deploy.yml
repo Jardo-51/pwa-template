@@ -28,13 +28,19 @@ jobs:
           lint: 'false'
 
       - name: Setup SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_HOST_KEY: ${{ secrets.DEPLOY_HOST_KEY }}
         run: |
           mkdir -p ~/.ssh
+          # Pass secrets through env and write them with printf rather than
+          # splicing ${{ secrets.* }} into the script text, so a `$` or backtick
+          # in a secret is never shell-parsed.
           # Create the key file already private (umask 077) rather than writing
           # it world-readable and chmod'ing afterwards, which leaves a brief
           # 0644 window.
-          (umask 077; echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519)
-          echo "${{ secrets.DEPLOY_HOST_KEY }}" >> ~/.ssh/known_hosts
+          (umask 077; printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519)
+          printf '%s\n' "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
         run: |
