@@ -115,6 +115,6 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
 
-- [ ] **30. (LOW)** Stray backticks in comments: `src/main.ts:4` ("mounts the App\`") and `src/styles/settings.scss:7` (URL ends with a backtick, breaking the link when clicked).
+- [x] **30. (LOW)** Stray backticks in comments: `src/main.ts:4` ("mounts the App\`") and `src/styles/settings.scss:7` (URL ends with a backtick, breaking the link when clicked).
 
 - [ ] **31. (LOW)** No test infrastructure at all, even though `.gitignore` and `tsconfig.node.json` anticipate Vitest/Cypress/Playwright and the flake ships a Playwright shell. For a template meant to seed real apps, a minimal Vitest + one smoke test (mount `App.vue`) would make downstream projects start with testing wired up.
