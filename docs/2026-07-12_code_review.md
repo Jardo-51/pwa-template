@@ -89,9 +89,9 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **16. (LOW)** `workbox-window` (`package.json:23`) is unused — it's only needed when importing the `virtual:pwa-register` module, and this app relies on the auto-injected `registerSW.js`. Also, `vite-plugin-pwa` is a build-time plugin and belongs in `devDependencies`. Remove `workbox-window`, move `vite-plugin-pwa` (and check whether `workbox-build` is still needed as an explicit dep — it's pulled in by `vite-plugin-pwa`).
 
-- [ ] **17. (LOW)** `tsconfig.node.json:3-9` includes `vitest.config.*`, `cypress.config.*`, `nightwatch.conf.*`, `playwright.config.*` — none exist in the project. Harmless but misleading; trim to `vite.config.*` (or keep deliberately as template affordance and add a comment).
+- [x] **17. (LOW)** `tsconfig.node.json:3-9` includes `vitest.config.*`, `cypress.config.*`, `nightwatch.conf.*`, `playwright.config.*` — none exist in the project. Harmless but misleading; trim to `vite.config.*` (or keep deliberately as template affordance and add a comment).
 
-- [ ] **18. (LOW)** `tsconfig.app.json:3` includes `"env.d.ts"` at the repo root, but the file lives at `src/env.d.ts` (already covered by `src/**/*`). Remove the stale entry or move the file to the root to match.
+- [x] **18. (LOW)** `tsconfig.app.json:3` includes `"env.d.ts"` at the repo root, but the file lives at `src/env.d.ts` (already covered by `src/**/*`). Remove the stale entry or move the file to the root to match.
 
 - [ ] **19. (LOW)** Routes in `src/router/index.ts` have no `name`. Named routes make programmatic navigation and active-state checks less brittle as the template grows.
 
