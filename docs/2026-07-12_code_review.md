@@ -109,9 +109,9 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **26. (LOW)** `deploy.yml:44-47` writes the SSH key with the default umask and then `chmod 600`s it — a brief window where the file is 0644. On an ephemeral single-tenant runner this is theoretical; still, `(umask 077; echo "…" > ~/.ssh/id_ed25519)` or `install -m 600` is the cleaner idiom.
 
-- [ ] **27. (LOW)** `build.yml` and `deploy.yml` duplicate the checkout/Nix/pnpm-cache/build sequence verbatim. Extract a composite action (`.github/actions/build/`) or a reusable workflow so the two can't drift.
+- [x] **27. (LOW)** `build.yml` and `deploy.yml` duplicate the checkout/Nix/pnpm-cache/build sequence verbatim. Extract a composite action (`.github/actions/build/`) or a reusable workflow so the two can't drift.
 
-- [ ] **28. (LOW)** No `concurrency` group in `build.yml` — rapid pushes to the same branch queue redundant builds. Add `concurrency: { group: build-${{ github.ref }}, cancel-in-progress: true }`.
+- [x] **28. (LOW)** No `concurrency` group in `build.yml` — rapid pushes to the same branch queue redundant builds. Add `concurrency: { group: build-${{ github.ref }}, cancel-in-progress: true }`.
 
 - [ ] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
 

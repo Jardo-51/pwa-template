@@ -1,0 +1,33 @@
+name: Build app
+description: Install Nix + pnpm, restore the pnpm store cache, and build the app.
+
+inputs:
+  lint:
+    description: Run `pnpm lint` before building.
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
+
+    # I experimented with caching the Nix store but it brought a performance penalty rather than benefit
+
+    - name: Cache pnpm store
+      uses: actions/cache@v5
+      with:
+        path: ~/.local/share/pnpm/store
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
+
+    - name: Build
+      shell: bash
+      run: |
+        nix develop --command bash -c "
+          set -e
+          pnpm install --frozen-lockfile
+          ${{ inputs.lint == 'true' && 'pnpm lint' || 'true' }}
+          pnpm build
+        "

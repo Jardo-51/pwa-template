@@ -22,26 +22,10 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      # I experimented with caching the Nix store but it brought a performance penalty rather than benefit
-
-      - name: Cache pnpm store
-        uses: actions/cache@v5
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
       - name: Build
-        run: |
-          nix develop --command bash -c "
-            set -e
-            pnpm install --frozen-lockfile
-            pnpm build
-          "
+        uses: ./.github/actions/build
+        with:
+          lint: 'false'
 
       - name: Setup SSH
         run: |
