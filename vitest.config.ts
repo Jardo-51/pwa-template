@@ -3,6 +3,10 @@ import Vue from '@vitejs/plugin-vue'
 import Vuetify from 'vite-plugin-vuetify'
 import { defineConfig } from 'vitest/config'
 
+// Intentionally a standalone config rather than `mergeConfig(viteConfig, …)`:
+// merging would pull the PWA/fonts plugins from vite.config.mts into the test
+// pipeline. The `@` alias and Vue/Vuetify plugins below are duplicated on
+// purpose — keep them in sync with vite.config.mts by hand.
 export default defineConfig({
   plugins: [
     Vue(),
