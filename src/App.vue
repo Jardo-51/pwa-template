@@ -27,5 +27,11 @@
 
   watch(() => app.darkMode, dark => {
     theme.change(dark ? 'dark' : 'light')
+    // Keep the browser chrome (theme-color) tracking the in-app theme rather
+    // than only the OS colour scheme, so a persisted dark toggle on a light OS
+    // still gets dark chrome.
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', dark ? '#121212' : '#1976D2')
   }, { immediate: true })
 </script>
