@@ -97,7 +97,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **20. (LOW)** No `scrollBehavior` on the router — navigating between pages preserves the previous scroll position. Add the standard `scrollBehavior: () => ({ top: 0 })` (with `savedPosition` support).
 
-- [ ] **21. (LOW)** Snackbar timeout is hardcoded to `3000` in `src/App.vue:12` while the rest of the snackbar state lives in the store. Move the timeout into the store (optionally as a `showSnackbar` parameter) so callers can control it.
+- [x] **21. (LOW)** Snackbar timeout is hardcoded to `3000` in `src/App.vue:12` while the rest of the snackbar state lives in the store. Move the timeout into the store (optionally as a `showSnackbar` parameter) so callers can control it.
 
 - [ ] **22. (LOW)** `class="pb-16"` on `<v-main>` (`src/App.vue:3`) may double-pad: `v-bottom-navigation` is a Vuetify layout component, so `v-main` should already reserve space for it. Verify in the browser; if the layout offset works, drop the class (or if it doesn't, prefer wiring the nav into the layout over a magic padding number).
 
