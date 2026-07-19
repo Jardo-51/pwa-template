@@ -24,10 +24,14 @@ runs:
 
     - name: Build
       shell: bash
+      # Pass the input through env and branch in shell rather than splicing the
+      # expression result into the script text.
+      env:
+        RUN_LINT: ${{ inputs.lint }}
       run: |
-        nix develop --command bash -c "
+        nix develop --command bash -c '
           set -e
           pnpm install --frozen-lockfile
-          ${{ inputs.lint == 'true' && 'pnpm lint' || 'true' }}
+          if [ "$RUN_LINT" = true ]; then pnpm lint; fi
           pnpm build
-        "
+        '
