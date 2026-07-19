@@ -36,50 +36,50 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 ## MEDIUM
 
-- [ ] **4. (MEDIUM)** Full MDI webfont (400 KB woff2, 3.5 MB across formats in dist) shipped for the 2 icons the template uses.
+- [x] **4. (MEDIUM)** Full MDI webfont (400 KB woff2, 3.5 MB across formats in dist) shipped for the 2 icons the template uses.
   `src/plugins/vuetify.ts:2` imports `@mdi/font`, which ships the complete ~7000-icon font in eot/ttf/woff/woff2 (all four end up in `dist/assets/`).
   **Fix:** switch to `@mdi/js` + the `mdi-svg` iconset (tree-shakable — only imported icon paths are bundled). Removes ~400 KB from the precache and all four font files from dist.
   **Note:** when this lands, also drop the `**/materialdesignicons*.woff2` entry from the workbox `globPatterns` in `vite.config.mts` (added in 045b3fd to precache the icon font) — it becomes a dead glob once the webfont is gone.
   **Caveat (ergonomics):** this trades the font's "type any icon name" convenience for smaller bundles. Today any of the ~7000 icons works by string — `<v-icon>mdi-home</v-icon>` — with zero setup. With `@mdi/js` + `mdi-svg`, every icon is still *available*, but each must be imported by name and passed as a path (`import { mdiHome } from '@mdi/js'` → `<v-icon :icon="mdiHome" />`); only imported icons ship, and the `mdi-xxx` string form stops working. Since this is a template, downstream apps inherit that workflow — worth documenting in the README so it isn't a surprise. (The two current usages in `AppBottomNav.vue` would migrate from `<v-icon>mdi-home</v-icon>` / `mdi-cog` to the imported-path form.)
   **Caveat (scope of what keeps working):** the split is whether an icon renders *through Vuetify* or *directly via the font's CSS classes*. (a) Vuetify's own built-in UI icons — checkbox checks, dropdown chevrons, close buttons, data-table sort arrows, pagination, etc. — keep working, but only if the config wires up `aliases` from the iconset (`import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'`), which re-exports them as SVG paths; omit `aliases` and Vuetify's chrome loses its icons. (b) Icon *props* on components (`prepend-icon`, `append-icon`, `v-btn` `icon`, `v-list-item`, `v-tab`, …) are supported but need the imported-path value, not the `mdi-xxx` string (with the svg set that string is treated as path data and renders nothing). (c) Raw font usage *outside* Vuetify breaks entirely, since the `@mdi/font` stylesheet is no longer loaded: `<i class="mdi mdi-home">`, custom CSS `::before { content: '\FXXXX'; font-family: 'Material Design Icons' }`, and any third-party lib expecting the MDI webfont. The template only uses `<v-icon>` today so in-repo impact is small, but downstream apps relying on (c) would need reworking.
 
-- [ ] **5. (MEDIUM)** `registerSW.js` is cached as immutable for 1 year despite not being content-hashed.
+- [x] **5. (MEDIUM)** `registerSW.js` is cached as immutable for 1 year despite not being content-hashed.
   `public/.htaccess:1-3` applies `max-age=31536000, immutable` to all `.js` files, but vite-plugin-pwa emits `dist/registerSW.js` with a stable name. If a plugin upgrade or config change (SW filename, scope, base) alters its content, existing visitors keep the stale registration script for up to a year.
   **Fix:** add a `<Files "registerSW.js">` block with the same no-cache headers used for `sw.js`.
 
-- [ ] **6. (MEDIUM)** No explicit cache headers for `index.html` and `manifest.webmanifest`.
+- [x] **6. (MEDIUM)** No explicit cache headers for `index.html` and `manifest.webmanifest`.
   `public/.htaccess` pins hashed assets and `sw.js`, but the HTML shell gets no `Cache-Control`, so browsers apply heuristic caching (a fraction of the `Last-Modified` age). Clients not yet controlled by the SW (first visits, users who cleared the SW) can receive a stale `index.html` referencing asset hashes; today rsync-without-delete masks this (see finding 12), but the two settings should not depend on each other.
   **Fix:** add `no-cache` (or `max-age=0, must-revalidate`) headers for `index.html` and `manifest.webmanifest`.
 
-- [ ] **7. (MEDIUM)** Dark mode ignores the OS preference — first launch is always light.
+- [x] **7. (MEDIUM)** Dark mode ignores the OS preference — first launch is always light.
   `src/stores/app.ts:8` defaults to light whenever `localStorage` is unset, and `src/plugins/vuetify.ts:7` sets `defaultTheme: 'light'`. Users with a system-wide dark preference get a white flash-bang on install.
   **Fix:** fall back to `window.matchMedia('(prefers-color-scheme: dark)').matches` when the localStorage key is absent (or restructure around Vuetify's `'system'` theme and store an explicit light/dark/system tri-state).
 
-- [ ] **8. (MEDIUM)** Consecutive snackbar messages can vanish almost immediately — the timeout is never reset.
+- [x] **8. (MEDIUM)** Consecutive snackbar messages can vanish almost immediately — the timeout is never reset.
   `src/stores/app.ts:10-14` sets `snackbar.value = true` while it may already be `true`; Vuetify's `VSnackbar` starts its `:timeout` (`src/App.vue:12`) only on the `false → true` transition, so a second `showSnackbar()` call replaces the text but inherits the first message's nearly expired timer.
   **Fix:** in `showSnackbar`, set `snackbar.value = false` then re-open on `nextTick()` (or maintain a message queue).
 
-- [ ] **9. (MEDIUM)** Manifest icon declares `purpose: 'any maskable'` on a non-maskable image.
+- [x] **9. (MEDIUM)** Manifest icon declares `purpose: 'any maskable'` on a non-maskable image.
   `vite.config.mts:54-59` reuses the plain 512×512 icon for both purposes. Maskable icons need the safe-zone padding (icon content within the inner 80%); a shared image either gets cropped on Android launchers or looks undersized elsewhere. Lighthouse flags combined `any maskable` for this reason.
   **Fix:** add a dedicated padded `pwa-maskable-512x512.png` with `purpose: 'maskable'` and keep the existing icons as `purpose: 'any'`.
 
-- [ ] **10. (MEDIUM)** GitHub workflows don't restrict `GITHUB_TOKEN` permissions.
+- [x] **10. (MEDIUM)** GitHub workflows don't restrict `GITHUB_TOKEN` permissions.
   Neither `.github/workflows/build.yml` nor `deploy.yml` declares a `permissions:` block, so jobs inherit the repo/org default, which may be read-write. Neither job needs more than `contents: read`.
   **Fix:** add `permissions: contents: read` at the workflow level in both files.
 
-- [ ] **11. (MEDIUM)** CI never runs ESLint — only type-check + build.
+- [x] **11. (MEDIUM)** CI never runs ESLint — only type-check + build.
   `.github/workflows/build.yml:27-32` runs `pnpm build` (which includes `type-check`), but `pnpm lint` is never executed, so lint regressions land silently.
   **Fix:** add `pnpm lint` to the build step (or a parallel job).
 
-- [ ] **12. (MEDIUM)** Deploys never delete anything — stale files accumulate on the server forever.
+- [x] **12. (MEDIUM)** Deploys never delete anything — stale files accumulate on the server forever.
   `deploy.yml:51` runs `rsync -crvz` without `--delete`. Every deploy layers new hashed assets over all previous ones; over time the doc root fills with dead JS/CSS/fonts, and removed files (e.g. an old page pre-rendered file) remain publicly served. Keeping one previous generation of assets is a legitimate strategy for open tabs, but unbounded accumulation isn't.
   **Fix:** if intentional, document it in the README and add a periodic cleanup; otherwise add `--delete` (safe here because the SW precaches everything the old clients need, and finding 6's no-cache HTML prevents stale-shell 404s).
 
-- [ ] **13. (MEDIUM)** `playwright` dev shell sits outside the standard flake output schema.
+- [x] **13. (MEDIUM)** `playwright` dev shell sits outside the standard flake output schema.
   `flake.nix:26-36` defines `outputs.playwright` at the top level rather than under `devShells.${system}`. `nix flake check`/`nix flake show` flag it as an unknown output, and `nix develop .#playwright` only resolves through the literal-attrpath fallback rather than the documented shell lookup.
   **Fix:** move it to `devShells.${system}.playwright`.
 
-- [ ] **14. (MEDIUM)** `resolve.extensions` includes `.vue`, which Vite explicitly recommends against.
+- [x] **14. (MEDIUM)** `resolve.extensions` includes `.vue`, which Vite explicitly recommends against.
   `vite.config.mts:81-89` re-declares the default extension list plus `.vue`. Allowing extension-less `.vue` imports breaks IDE/type tooling (vue-tsc and Volar expect explicit `.vue` extensions, which the codebase already uses everywhere).
   **Fix:** delete the `extensions` array entirely (the defaults suffice).
 

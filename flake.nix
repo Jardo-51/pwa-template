@@ -11,28 +11,30 @@
       pkgs = import nixpkgs { inherit system; };
     in {
 
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
-          pkgs.nodejs
-          pkgs.pnpm
-        ];
+      devShells.${system} = {
+        default = pkgs.mkShell {
+          buildInputs = [
+            pkgs.nodejs
+            pkgs.pnpm
+          ];
 
-        shellHook = ''
-          echo "Node.js version: $(node -v)"
-          echo "pnpm version: $(pnpm -v)"
-        '';
-      };
+          shellHook = ''
+            echo "Node.js version: $(node -v)"
+            echo "pnpm version: $(pnpm -v)"
+          '';
+        };
 
-      playwright = pkgs.mkShell {
-        buildInputs = [
-          pkgs.nodejs
-          pkgs.pnpm
-        ];
-        nativeBuildInputs = with pkgs; [ playwright-driver.browsers ];
-        shellHook = ''
-          export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
-          export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-        '';
+        playwright = pkgs.mkShell {
+          buildInputs = [
+            pkgs.nodejs
+            pkgs.pnpm
+          ];
+          nativeBuildInputs = with pkgs; [ playwright-driver.browsers ];
+          shellHook = ''
+            export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
+            export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+          '';
+        };
       };
 
     };
