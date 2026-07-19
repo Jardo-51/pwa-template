@@ -30,6 +30,7 @@ jobs:
       - name: Build
         run: |
           nix develop --command bash -c "
+            set -e
             pnpm install --frozen-lockfile
             pnpm lint
             pnpm build
