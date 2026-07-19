@@ -93,9 +93,9 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **18. (LOW)** `tsconfig.app.json:3` includes `"env.d.ts"` at the repo root, but the file lives at `src/env.d.ts` (already covered by `src/**/*`). Remove the stale entry or move the file to the root to match.
 
-- [ ] **19. (LOW)** Routes in `src/router/index.ts` have no `name`. Named routes make programmatic navigation and active-state checks less brittle as the template grows.
+- [x] **19. (LOW)** Routes in `src/router/index.ts` have no `name`. Named routes make programmatic navigation and active-state checks less brittle as the template grows.
 
-- [ ] **20. (LOW)** No `scrollBehavior` on the router — navigating between pages preserves the previous scroll position. Add the standard `scrollBehavior: () => ({ top: 0 })` (with `savedPosition` support).
+- [x] **20. (LOW)** No `scrollBehavior` on the router — navigating between pages preserves the previous scroll position. Add the standard `scrollBehavior: () => ({ top: 0 })` (with `savedPosition` support).
 
 - [ ] **21. (LOW)** Snackbar timeout is hardcoded to `3000` in `src/App.vue:12` while the rest of the snackbar state lives in the store. Move the timeout into the store (optionally as a `showSnackbar` parameter) so callers can control it.
 
