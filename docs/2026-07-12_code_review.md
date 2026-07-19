@@ -101,7 +101,7 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 - [x] **22. (LOW)** `class="pb-16"` on `<v-main>` (`src/App.vue:3`) may double-pad: `v-bottom-navigation` is a Vuetify layout component, so `v-main` should already reserve space for it. Verify in the browser; if the layout offset works, drop the class (or if it doesn't, prefer wiring the nav into the layout over a magic padding number).
 
-- [ ] **23. (LOW)** `index.html` lacks a `<meta name="description">`, and the single `theme-color` (`#1976D2`) doesn't adapt to dark mode. Add a description and consider paired `<meta name="theme-color" media="(prefers-color-scheme: …)">` tags.
+- [x] **23. (LOW)** `index.html` lacks a `<meta name="description">`, and the single `theme-color` (`#1976D2`) doesn't adapt to dark mode. Add a description and consider paired `<meta name="theme-color" media="(prefers-color-scheme: …)">` tags.
 
 - [ ] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
 
