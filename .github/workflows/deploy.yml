@@ -22,33 +22,25 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      # I experimented with caching the Nix store but it brought a performance penalty rather than benefit
-
-      - name: Cache pnpm store
-        uses: actions/cache@v5
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
       - name: Build
-        run: |
-          nix develop --command bash -c "
-            set -e
-            pnpm install --frozen-lockfile
-            pnpm build
-          "
+        uses: ./.github/actions/build
+        with:
+          lint: 'false'
 
       - name: Setup SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_HOST_KEY: ${{ secrets.DEPLOY_HOST_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo "${{ secrets.DEPLOY_HOST_KEY }}" >> ~/.ssh/known_hosts
+          # Pass secrets through env and write them with printf rather than
+          # splicing ${{ secrets.* }} into the script text, so a `$` or backtick
+          # in a secret is never shell-parsed.
+          # Create the key file already private (umask 077) rather than writing
+          # it world-readable and chmod'ing afterwards, which leaves a brief
+          # 0644 window.
+          (umask 077; printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519)
+          printf '%s\n' "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
         run: |

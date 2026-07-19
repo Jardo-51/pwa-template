@@ -26,6 +26,9 @@ pnpm build
 
 # Lint
 pnpm lint
+
+# Run tests once (or `pnpm test:watch` while developing)
+pnpm test
 ```
 
 Alternatively, if you use [Nix](https://nixos.org/), you can run commands via the project's dev shell:
@@ -44,8 +47,11 @@ src/
 │   └── settings/    # Theme toggle
 ├── stores/          # Pinia stores (app: snackbar, dark mode)
 ├── plugins/         # Vuetify, Pinia, Router config
+├── __tests__/       # Vitest setup + smoke test (App mount)
 └── main.ts          # App entry point
 ```
+
+Tests run on [Vitest](https://vitest.dev/) with [@vue/test-utils](https://test-utils.vuejs.org/) in a jsdom environment. `src/__tests__/App.spec.ts` mounts the whole app as a smoke test; add more specs alongside it (any `*.spec.ts` / `*.test.ts` under `src/`). CI runs `pnpm test` on every push.
 
 ## PWA & Offline Support
 

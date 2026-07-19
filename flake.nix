@@ -7,11 +7,12 @@
 
   outputs = { self, nixpkgs }:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      forAllSystems = f:
+        nixpkgs.lib.genAttrs systems (system: f (import nixpkgs { inherit system; }));
     in {
 
-      devShells.${system} = {
+      devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
           buildInputs = [
             pkgs.nodejs
@@ -35,7 +36,7 @@
             export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
           '';
         };
-      };
+      });
 
     };
 }

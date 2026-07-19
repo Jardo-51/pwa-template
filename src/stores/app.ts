@@ -5,6 +5,7 @@ export const useAppStore = defineStore('app', () => {
   const snackbar = ref(false)
   const snackbarText = ref('')
   const snackbarColor = ref('success')
+  const snackbarTimeout = ref(3000)
   // Honour the user's explicit choice when set; otherwise fall back to the OS
   // colour-scheme preference so a system-wide dark setting doesn't get a white
   // flash-bang on first launch.
@@ -24,7 +25,7 @@ export const useAppStore = defineStore('app', () => {
     prefersDark.addEventListener('change', followSystemPreference)
   }
 
-  function showSnackbar (text: string, color = 'success') {
+  function showSnackbar (text: string, color = 'success', timeout = 3000) {
     // Force a false → true transition so VSnackbar restarts its timeout even
     // when a previous message is still showing; otherwise the new message
     // inherits the old (nearly expired) timer and can vanish immediately.
@@ -32,6 +33,7 @@ export const useAppStore = defineStore('app', () => {
     void nextTick(() => {
       snackbarText.value = text
       snackbarColor.value = color
+      snackbarTimeout.value = timeout
       snackbar.value = true
     })
   }
@@ -47,6 +49,7 @@ export const useAppStore = defineStore('app', () => {
     snackbar,
     snackbarText,
     snackbarColor,
+    snackbarTimeout,
     darkMode,
     showSnackbar,
     toggleDarkMode,

@@ -85,36 +85,36 @@ The dominant problem is **font handling**: the `unplugin-fonts` fontsource confi
 
 ## LOW
 
-- [ ] **15. (LOW)** `define: { 'process.env': {} }` in `vite.config.mts:76` is a legacy scaffold shim. Nothing in the app or current Vuetify reads `process.env`; it silently masks misuse of Node envs in browser code. Try removing it (verify with a build).
+- [x] **15. (LOW)** `define: { 'process.env': {} }` in `vite.config.mts:76` is a legacy scaffold shim. Nothing in the app or current Vuetify reads `process.env`; it silently masks misuse of Node envs in browser code. Try removing it (verify with a build).
 
-- [ ] **16. (LOW)** `workbox-window` (`package.json:23`) is unused — it's only needed when importing the `virtual:pwa-register` module, and this app relies on the auto-injected `registerSW.js`. Also, `vite-plugin-pwa` is a build-time plugin and belongs in `devDependencies`. Remove `workbox-window`, move `vite-plugin-pwa` (and check whether `workbox-build` is still needed as an explicit dep — it's pulled in by `vite-plugin-pwa`).
+- [x] **16. (LOW)** `workbox-window` (`package.json:23`) is unused — it's only needed when importing the `virtual:pwa-register` module, and this app relies on the auto-injected `registerSW.js`. Also, `vite-plugin-pwa` is a build-time plugin and belongs in `devDependencies`. Remove `workbox-window`, move `vite-plugin-pwa` (and check whether `workbox-build` is still needed as an explicit dep — it's pulled in by `vite-plugin-pwa`).
 
-- [ ] **17. (LOW)** `tsconfig.node.json:3-9` includes `vitest.config.*`, `cypress.config.*`, `nightwatch.conf.*`, `playwright.config.*` — none exist in the project. Harmless but misleading; trim to `vite.config.*` (or keep deliberately as template affordance and add a comment).
+- [x] **17. (LOW)** `tsconfig.node.json:3-9` includes `vitest.config.*`, `cypress.config.*`, `nightwatch.conf.*`, `playwright.config.*` — none exist in the project. Harmless but misleading; trim to `vite.config.*` (or keep deliberately as template affordance and add a comment).
 
-- [ ] **18. (LOW)** `tsconfig.app.json:3` includes `"env.d.ts"` at the repo root, but the file lives at `src/env.d.ts` (already covered by `src/**/*`). Remove the stale entry or move the file to the root to match.
+- [x] **18. (LOW)** `tsconfig.app.json:3` includes `"env.d.ts"` at the repo root, but the file lives at `src/env.d.ts` (already covered by `src/**/*`). Remove the stale entry or move the file to the root to match.
 
-- [ ] **19. (LOW)** Routes in `src/router/index.ts` have no `name`. Named routes make programmatic navigation and active-state checks less brittle as the template grows.
+- [x] **19. (LOW)** Routes in `src/router/index.ts` have no `name`. Named routes make programmatic navigation and active-state checks less brittle as the template grows.
 
-- [ ] **20. (LOW)** No `scrollBehavior` on the router — navigating between pages preserves the previous scroll position. Add the standard `scrollBehavior: () => ({ top: 0 })` (with `savedPosition` support).
+- [x] **20. (LOW)** No `scrollBehavior` on the router — navigating between pages preserves the previous scroll position. Add the standard `scrollBehavior: () => ({ top: 0 })` (with `savedPosition` support).
 
-- [ ] **21. (LOW)** Snackbar timeout is hardcoded to `3000` in `src/App.vue:12` while the rest of the snackbar state lives in the store. Move the timeout into the store (optionally as a `showSnackbar` parameter) so callers can control it.
+- [x] **21. (LOW)** Snackbar timeout is hardcoded to `3000` in `src/App.vue:12` while the rest of the snackbar state lives in the store. Move the timeout into the store (optionally as a `showSnackbar` parameter) so callers can control it.
 
-- [ ] **22. (LOW)** `class="pb-16"` on `<v-main>` (`src/App.vue:3`) may double-pad: `v-bottom-navigation` is a Vuetify layout component, so `v-main` should already reserve space for it. Verify in the browser; if the layout offset works, drop the class (or if it doesn't, prefer wiring the nav into the layout over a magic padding number).
+- [x] **22. (LOW)** `class="pb-16"` on `<v-main>` (`src/App.vue:3`) may double-pad: `v-bottom-navigation` is a Vuetify layout component, so `v-main` should already reserve space for it. Verify in the browser; if the layout offset works, drop the class (or if it doesn't, prefer wiring the nav into the layout over a magic padding number).
 
-- [ ] **23. (LOW)** `index.html` lacks a `<meta name="description">`, and the single `theme-color` (`#1976D2`) doesn't adapt to dark mode. Add a description and consider paired `<meta name="theme-color" media="(prefers-color-scheme: …)">` tags.
+- [x] **23. (LOW)** `index.html` lacks a `<meta name="description">`, and the single `theme-color` (`#1976D2`) doesn't adapt to dark mode. Add a description and consider paired `<meta name="theme-color" media="(prefers-color-scheme: …)">` tags.
 
-- [ ] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
+- [x] **24. (LOW)** Manifest polish: no `id` field (Chromium uses it for app identity across `start_url` changes), and `orientation: 'portrait'` hard-locks installed desktop/tablet windows. Add `id: '/'` and reconsider the orientation lock per app.
 
-- [ ] **25. (LOW)** `.htaccess` hardening: add `AddType application/manifest+json .webmanifest` (older Apache serves it as `text/plain`), and consider `form-action 'self'` in the CSP. `X-Frame-Options` is redundant next to `frame-ancestors 'none'` but harmless.
+- [x] **25. (LOW)** `.htaccess` hardening: add `AddType application/manifest+json .webmanifest` (older Apache serves it as `text/plain`), and consider `form-action 'self'` in the CSP. `X-Frame-Options` is redundant next to `frame-ancestors 'none'` but harmless.
 
-- [ ] **26. (LOW)** `deploy.yml:44-47` writes the SSH key with the default umask and then `chmod 600`s it — a brief window where the file is 0644. On an ephemeral single-tenant runner this is theoretical; still, `(umask 077; echo "…" > ~/.ssh/id_ed25519)` or `install -m 600` is the cleaner idiom.
+- [x] **26. (LOW)** `deploy.yml:44-47` writes the SSH key with the default umask and then `chmod 600`s it — a brief window where the file is 0644. On an ephemeral single-tenant runner this is theoretical; still, `(umask 077; echo "…" > ~/.ssh/id_ed25519)` or `install -m 600` is the cleaner idiom.
 
-- [ ] **27. (LOW)** `build.yml` and `deploy.yml` duplicate the checkout/Nix/pnpm-cache/build sequence verbatim. Extract a composite action (`.github/actions/build/`) or a reusable workflow so the two can't drift.
+- [x] **27. (LOW)** `build.yml` and `deploy.yml` duplicate the checkout/Nix/pnpm-cache/build sequence verbatim. Extract a composite action (`.github/actions/build/`) or a reusable workflow so the two can't drift.
 
-- [ ] **28. (LOW)** No `concurrency` group in `build.yml` — rapid pushes to the same branch queue redundant builds. Add `concurrency: { group: build-${{ github.ref }}, cancel-in-progress: true }`.
+- [x] **28. (LOW)** No `concurrency` group in `build.yml` — rapid pushes to the same branch queue redundant builds. Add `concurrency: { group: build-${{ github.ref }}, cancel-in-progress: true }`.
 
-- [ ] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
+- [x] **29. (LOW)** `flake.nix:10` hardcodes `x86_64-linux`; the dev shell won't evaluate on macOS or aarch64. Fine if the team is Linux-only; otherwise map over systems (e.g. `nixpkgs.lib.genAttrs` or `flake-utils`).
 
-- [ ] **30. (LOW)** Stray backticks in comments: `src/main.ts:4` ("mounts the App\`") and `src/styles/settings.scss:7` (URL ends with a backtick, breaking the link when clicked).
+- [x] **30. (LOW)** Stray backticks in comments: `src/main.ts:4` ("mounts the App\`") and `src/styles/settings.scss:7` (URL ends with a backtick, breaking the link when clicked).
 
-- [ ] **31. (LOW)** No test infrastructure at all, even though `.gitignore` and `tsconfig.node.json` anticipate Vitest/Cypress/Playwright and the flake ships a Playwright shell. For a template meant to seed real apps, a minimal Vitest + one smoke test (mount `App.vue`) would make downstream projects start with testing wired up.
+- [x] **31. (LOW)** No test infrastructure at all, even though `.gitignore` and `tsconfig.node.json` anticipate Vitest/Cypress/Playwright and the flake ships a Playwright shell. For a template meant to seed real apps, a minimal Vitest + one smoke test (mount `App.vue`) would make downstream projects start with testing wired up.

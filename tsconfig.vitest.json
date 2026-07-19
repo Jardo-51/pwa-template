@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.app.json",
+  // Broad include on purpose: this composite project has no `references`, so it
+  // must list every file the tests reach (App.vue, the router, stores, …).
+  // Narrowing to `src/**/__tests__/*` (the create-vue default) makes `vue-tsc
+  // --build` fail with TS6307 on each of those transitively imported files.
+  "include": ["src/**/*", "src/**/*.vue"],
+  "exclude": [],
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",
+
+    "types": ["node"]
+  }
+}

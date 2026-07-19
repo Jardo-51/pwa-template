@@ -25,7 +25,11 @@
     Header set Expires "0"
 </FilesMatch>
 
-Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self';"
+# Older Apache configs serve .webmanifest as text/plain, which some browsers
+# reject for the PWA manifest; force the correct type.
+AddType application/manifest+json .webmanifest
+
+Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 Header set X-Content-Type-Options "nosniff"
 Header set X-Frame-Options "DENY"
 
