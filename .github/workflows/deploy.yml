@@ -46,8 +46,10 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          # Create the key file already private (umask 077) rather than writing
+          # it world-readable and chmod'ing afterwards, which leaves a brief
+          # 0644 window.
+          (umask 077; echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519)
           echo "${{ secrets.DEPLOY_HOST_KEY }}" >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
