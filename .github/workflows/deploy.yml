@@ -1,13 +1,12 @@
 name: Deploy
-run-name: "Deploy (${{ inputs.ref }})"
+run-name: "Deploy (${{ inputs.ref-overwrite || github.ref_name }})"
 
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: Branch or tag to deploy
+      ref-overwrite:
+        description: Branch or tag to deploy; blank = dispatched ref
         required: false
-        default: main
 
 permissions:
   contents: read
@@ -20,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref-overwrite || github.ref }}
 
       - name: Build
         uses: ./.github/actions/build
