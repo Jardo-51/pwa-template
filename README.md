@@ -89,9 +89,9 @@ delete the demo pages:
 - `pwa.spec.ts` — the network goes down and the app still reloads, keeps its
   stored settings, routes between its lazily-loaded pages, and answers a cold
   `/settings` (and an unknown path) out of workbox's navigate fallback. This is
-  the one worth keeping green as an app grows: it catches a `globPatterns` or
-  manifest change that leaves the app booting fine on a warm network and dead on
-  a train.
+  the one worth keeping green as an app grows: it catches a `globPatterns`
+  change that leaves the app booting fine on a warm network and dead on a train.
+  It does not check the web app manifest.
 - `settings.spec.ts` — the dark-mode switch, that the choice survives a reload,
   and that the OS colour scheme is followed only until the user makes one.
 

@@ -18,8 +18,13 @@ import {
  * assertion below passes with the worker deleted.
  *
  * This is the test an app built on the template should keep running as it grows
- * — the failure it catches is a `globPatterns` or a `manifest` change that
- * leaves the app booting fine on a warm network and dead on a train.
+ * — the failure it catches is a `globPatterns` change that leaves the app
+ * booting fine on a warm network and dead on a train.
+ *
+ * It says nothing about the web app manifest: nothing here fetches
+ * `manifest.webmanifest` or checks installability, and `globPatterns` does not
+ * even list that extension, so a broken `start_url` or a dropped icon passes
+ * this file silently. That is a gap worth closing, not a claim to make here.
  */
 test.describe('the app with the network down', () => {
   test('reloads, routes and keeps its settings', async ({ page }) => {

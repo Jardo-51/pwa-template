@@ -69,9 +69,14 @@ and the app still reloads, keeps its stored settings, routes between its
 lazily-loaded pages and answers a cold `/settings` — and a cold unknown path —
 out of workbox's navigate fallback. Every assertion in it passes with the worker
 deleted as long as the network is up, which is why it cuts it. It is the test
-worth keeping green as an app grows: what it catches is a `globPatterns` or
-manifest change that leaves the app booting fine on a warm network and dead on a
-train.
+worth keeping green as an app grows: what it catches is a `globPatterns` change
+that leaves the app booting fine on a warm network and dead on a train.
+
+It does *not* cover the web app manifest — nothing fetches
+`manifest.webmanifest` or checks installability, and `globPatterns` in
+`vite.config.mts` does not list that extension — so a broken `start_url` or a
+dropped icon passes silently. Fetching the manifest while offline and asserting
+on it would be a good first addition.
 
 `settings.spec.ts` is the theme: the switch in Settings, that the choice
 survives a reload (it lives in localStorage, so the reload *is* the test), and
