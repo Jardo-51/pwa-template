@@ -46,11 +46,17 @@ export async function serviceWorkerReady (page: Page) {
     () => navigator.serviceWorker.controller !== null,
     undefined,
     { timeout: 30_000 },
-  ).catch(() => {
+  ).catch(error => {
+    // `cause` because this catch is unconditional: the diagnosis below fits the
+    // timeout it is written for, but `waitForFunction` also rejects when
+    // `navigator.serviceWorker` is undefined (an insecure origin) or the page
+    // closes mid-wait, and those must not be reported as a precache problem
+    // with no way back to what actually happened.
     throw new Error(
       'No service worker took control of the page, so the precache was never '
       + 'written — an asset in `globPatterns` that cannot be fetched fails the '
       + 'install step and the worker never activates.',
+      { cause: error },
     )
   })
 }
