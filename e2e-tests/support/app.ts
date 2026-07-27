@@ -118,7 +118,7 @@ export function settingsCard (page: Page) {
 
 /** The Appearance card's switch. Its own label is what the user reads. */
 export function darkModeSwitch (page: Page) {
-  return page.getByLabel('Dark mode')
+  return page.getByLabel('Dark mode', { exact: true })
 }
 
 /**
