@@ -97,7 +97,7 @@ delete the demo pages:
 
 CI runs the e2e suite on pull requests and pushes to `main` (a separate workflow
 from Build, which stays fast and gates every push), and uploads the HTML report
-as an artifact on failure.
+as an artifact on every run.
 
 ## PWA & Offline Support
 
