@@ -30,6 +30,12 @@ test.describe('the app with the network down', () => {
     await setDarkMode(page, true)
     await serviceWorkerReady(page)
 
+    // Back to `/` before cutting the network, so the reload below is a document
+    // request for the root and the `/settings` one further down is the first
+    // for a path no file corresponds to. Reloading on `/settings` instead would
+    // make that later block a re-run of this one.
+    await openHome(page)
+
     await page.context().setOffline(true)
     await page.reload()
 
@@ -49,10 +55,12 @@ test.describe('the app with the network down', () => {
     // A cold start on a URL that no file corresponds to: `/settings` is a
     // client-side route, so this is workbox's navigate fallback handing back
     // the precached `index.html` and the router taking it from there. The
-    // in-app navigation above cannot show this — it never made a document
-    // request — and it is what a user reopening an installed app does. Home
-    // first so the assertion stands on its own: Settings being on screen after
-    // it can only be the cold start having rendered it.
+    // reload above only showed the fallback answering for `/`, which the
+    // precache has a real file for; the in-app navigation cannot show it at all
+    // — it never made a document request. This is what a user reopening an
+    // installed app on a deep link does. Home first so the assertion stands on
+    // its own: Settings being on screen after it can only be the cold start
+    // having rendered it.
     await openHome(page)
     await page.goto('/settings')
     await expect(settingsCard(page)).toBeVisible()
