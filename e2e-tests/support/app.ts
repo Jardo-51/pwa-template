@@ -116,11 +116,6 @@ export function settingsCard (page: Page) {
   return page.locator('.v-card').filter({ hasText: 'Appearance' })
 }
 
-/** The text of whatever the app is currently telling the user. */
-export function snackbar (page: Page) {
-  return page.locator('.v-snackbar__content')
-}
-
 /** The Appearance card's switch. Its own label is what the user reads. */
 export function darkModeSwitch (page: Page) {
   return page.getByLabel('Dark mode')
