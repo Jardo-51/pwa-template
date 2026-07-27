@@ -36,7 +36,10 @@ jobs:
 
       # The browsers come from the playwright shell, so the whole store is
       # worth keeping between runs. Keyed on the flake, which is what decides
-      # what is in it.
+      # what is in it. This is the opposite call from the one recorded in
+      # `.github/actions/setup`, where caching the store cost more than it
+      # saved — that is about the default shell, and it is the browser closure
+      # here, far larger than `nodejs` + `pnpm`, that flips the tradeoff.
       - name: Cache Nix store
         uses: nix-community/cache-nix-action@v7
         with:
