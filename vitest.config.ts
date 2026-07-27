@@ -17,7 +17,10 @@ export default defineConfig({
     // Scoped to `src/` on purpose: Vitest's default include also matches
     // `e2e-tests/*.spec.ts`, and those are Playwright specs — under Vitest they
     // fail at the `@playwright/test` import rather than doing anything useful.
-    include: ['src/**/*.{test,spec}.ts'],
+    // The extension half is Vitest's own default, kept verbatim: narrowing it to
+    // `.ts` would silently stop collecting a `Foo.spec.tsx`, and a test that
+    // never runs looks exactly like one that passes.
+    include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     setupFiles: ['./src/__tests__/setup.ts'],
     // Vuetify ships untranspiled ESM that Vitest must process rather than
     // externalise.
