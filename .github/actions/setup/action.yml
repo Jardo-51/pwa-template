@@ -1,0 +1,37 @@
+name: Set up toolchain
+description: Install Nix and restore the pnpm store cache.
+
+# Everything every workflow needs before it can run `nix develop`. Extracted so
+# the Build and E2E workflows share one copy: the pnpm cache key in particular
+# was duplicated verbatim, and the symptom of the two drifting is a cold cache
+# on one workflow only — slow rather than loud.
+
+inputs:
+  github_access_token:
+    description: >-
+      Token the Nix installer uses when it fetches flake inputs from GitHub,
+      which raises the anonymous API rate limit. Pass `secrets.GITHUB_TOKEN`;
+      a composite action cannot read the secrets context itself.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
+      with:
+        # Single-user install: the runner is one user with root, so the daemon
+        # only adds setup time.
+        install_options: --no-daemon
+        github_access_token: ${{ inputs.github_access_token }}
+
+    # I experimented with caching the Nix store but it brought a performance penalty rather than benefit
+
+    - name: Cache pnpm store
+      uses: actions/cache@v5
+      with:
+        path: ~/.local/share/pnpm/store
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-

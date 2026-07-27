@@ -25,10 +25,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
+      # Nix + the pnpm store cache, shared with the Build workflow. This one
+      # does not use `.github/actions/build` itself: it wants the Nix store
+      # cache below in between, and the `pnpm build` that action ends with is
+      # redundant here — playwright's `webServer` builds the app anyway.
+      - name: Set up toolchain
+        uses: ./.github/actions/setup
         with:
-          install_options: --no-daemon
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       # The browsers come from the playwright shell, so the whole store is
@@ -39,14 +42,6 @@ jobs:
         with:
           primary-key: nix-playwright-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
           restore-prefixes-first-match: nix-playwright-${{ runner.os }}-
-
-      - name: Cache pnpm store
-        uses: actions/cache@v5
-        with:
-          path: ~/.local/share/pnpm/store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
 
       - name: Install
         run: nix develop --command bash -c "pnpm install --frozen-lockfile"
