@@ -1,0 +1,20 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  // Only the tests themselves. Where a spec needs something the app defines —
+  // a store key, a channel name — list that file here too rather than copying
+  // the value: it cannot come in as a project reference, because
+  // tsconfig.app.json disables emit and a referenced project may not.
+  "include": ["e2e-tests/**/*"],
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.e2e-tests.tsbuildinfo",
+
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    // The tests run in node, but the callbacks they hand to page.evaluate run
+    // in the browser, so both sets of globals have to be in scope.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  }
+}

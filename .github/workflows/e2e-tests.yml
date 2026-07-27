@@ -1,0 +1,69 @@
+name: E2E Tests
+
+# Separate from Build on purpose: Build gates every push and stays fast, while
+# this one makes a production build and drives it in a browser. Pull requests
+# and main only — running it on every WIP commit is not worth the minutes.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          install_options: --no-daemon
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The browsers come from the playwright shell, so the whole store is
+      # worth keeping between runs. Keyed on the flake, which is what decides
+      # what is in it.
+      - name: Cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-playwright-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-playwright-${{ runner.os }}-
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install
+        run: nix develop --command bash -c "pnpm install --frozen-lockfile"
+
+      # Through the playwright shell, the same way the tests are run locally:
+      # it brings the browsers with it, pinned alongside the @playwright/test
+      # version, so CI and a dev machine drive the identical binary. Installing
+      # them here instead (`playwright install`) hangs until the step times out.
+      - name: Test
+        run: nix develop .#playwright --command bash -c "pnpm test:e2e"
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

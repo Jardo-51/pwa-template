@@ -14,6 +14,10 @@ export default defineConfig({
   ],
   test: {
     environment: 'jsdom',
+    // Scoped to `src/` on purpose: Vitest's default include also matches
+    // `e2e-tests/*.spec.ts`, and those are Playwright specs — under Vitest they
+    // fail at the `@playwright/test` import rather than doing anything useful.
+    include: ['src/**/*.{test,spec}.ts'],
     setupFiles: ['./src/__tests__/setup.ts'],
     // Vuetify ships untranspiled ESM that Vitest must process rather than
     // externalise.

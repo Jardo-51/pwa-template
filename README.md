@@ -27,8 +27,11 @@ pnpm build
 # Lint
 pnpm lint
 
-# Run tests once (or `pnpm test:watch` while developing)
+# Run unit tests once (or `pnpm test:watch` while developing)
 pnpm test
+
+# Run the end-to-end tests (needs the Nix playwright shell, see below)
+nix develop .#playwright -c pnpm test:e2e
 ```
 
 Alternatively, if you use [Nix](https://nixos.org/), you can run commands via the project's dev shell:
@@ -49,9 +52,52 @@ src/
 ├── plugins/         # Vuetify, Pinia, Router config
 ├── __tests__/       # Vitest setup + smoke test (App mount)
 └── main.ts          # App entry point
+
+e2e-tests/           # Playwright specs (service worker, theme) + helpers
 ```
 
-Tests run on [Vitest](https://vitest.dev/) with [@vue/test-utils](https://test-utils.vuejs.org/) in a jsdom environment. `src/__tests__/App.spec.ts` mounts the whole app as a smoke test; add more specs alongside it (any `*.spec.ts` / `*.test.ts` under `src/`). CI runs `pnpm test` on every push.
+## Testing
+
+Two layers, run separately.
+
+**Unit / component** — [Vitest](https://vitest.dev/) with
+[@vue/test-utils](https://test-utils.vuejs.org/) in a jsdom environment.
+`src/__tests__/App.spec.ts` mounts the whole app as a smoke test; add more specs
+alongside it (any `*.spec.ts` / `*.test.ts` under `src/`). `src/__tests__/setup.ts`
+stubs the browser APIs jsdom lacks but Vuetify and the app store need
+(`ResizeObserver`, `matchMedia`, `scrollTo`). CI runs `pnpm test` on every push.
+
+**End-to-end** — [Playwright](https://playwright.dev/) driving the **production
+build** in Chromium: `playwright.config.ts` runs `pnpm build` and a `vite
+preview` server itself, so a run exercises the minified bundle, the lazy route
+chunks and the service worker.
+
+```bash
+nix develop .#playwright -c pnpm test:e2e
+```
+
+The browsers come from nixpkgs via the `playwright` dev shell rather than from
+`playwright install`, and CI uses the same shell, so both drive the same binary.
+`@playwright/test` is therefore pinned exactly (no caret) to the version nixpkgs
+ships — bump the two together. See [`e2e-tests/README.md`](e2e-tests/README.md)
+for that, for the conventions the specs follow, and for how to run one file or
+step through a failure.
+
+The two suites are about the template itself, so they stay useful after you
+delete the demo pages:
+
+- `pwa.spec.ts` — the network goes down and the app still reloads, keeps its
+  stored settings, routes between its lazily-loaded pages, and answers a cold
+  `/settings` (and an unknown path) out of workbox's navigate fallback. This is
+  the one worth keeping green as an app grows: it catches a `globPatterns` or
+  manifest change that leaves the app booting fine on a warm network and dead on
+  a train.
+- `settings.spec.ts` — the dark-mode switch, that the choice survives a reload,
+  and that the OS colour scheme is followed only until the user makes one.
+
+CI runs the e2e suite on pull requests and pushes to `main` (a separate workflow
+from Build, which stays fast and gates every push), and uploads the HTML report
+as an artifact on failure.
 
 ## PWA & Offline Support
 
@@ -123,7 +169,8 @@ is **not** available, since the `@mdi/font` stylesheet is no longer loaded.
 
 GitHub Actions workflows are included:
 
-- **Build** — runs on every push, validates the project compiles
+- **Build** — runs on every push: lint, build, unit tests
+- **E2E Tests** — pull requests and `main`: production build driven in Chromium
 - **Deploy** — manual trigger, builds and deploys via `rsync` over SSH
 
 Required repository secrets for deployment:
