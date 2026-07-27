@@ -49,6 +49,13 @@ jobs:
       - name: Install
         run: nix develop --command bash -c "pnpm install --frozen-lockfile"
 
+      # Before the suite rather than after it, so that when the two halves of
+      # the pin have drifted the log leads with which ones and how to fix it,
+      # instead of with a browser launch failing on "Executable doesn't exist"
+      # — a message that names neither the pin nor the flake.
+      - name: Check the Playwright pin
+        run: nix develop --command bash -c "pnpm check:playwright-pin"
+
       # Through the playwright shell, the same way the tests are run locally:
       # it brings the browsers with it, pinned alongside the @playwright/test
       # version, so CI and a dev machine drive the identical binary. Installing

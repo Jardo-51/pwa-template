@@ -52,11 +52,29 @@ E2E_PORT=4273 nix develop .#playwright -c pnpm test:e2e
 
 `playwright-driver.browsers` pins one set of browser revisions, and
 `@playwright/test` in `package.json` is pinned exactly (no caret) to match.
-Bump them together:
+Nothing in the package manager knows about that coupling, so a routine
+`pnpm update -L` — or a bump of the nixpkgs branch in `flake.lock` — moves one
+side and not the other. The symptom is a launch failing with *"Executable
+doesn't exist"*, which names neither the pin nor the flake and sends people to
+`playwright install`, "fixing" it locally while leaving CI broken.
+
+`scripts/check-playwright-pin.sh` is the guard for that. It reads the installed
+package version and the driver version out of the flake's own locked input, and
+fails with the command that reconciles them:
 
 ```sh
-nix eval --raw 'github:NixOS/nixpkgs/nixos-26.05#playwright-driver.version'
-pnpm add -D @playwright/test@<that version>
+pnpm check:playwright-pin
+```
+
+CI runs it in `e2e-tests.yml` **before** the suite, so the diagnosis arrives
+ahead of the failure it explains. It also rejects a range spec (`^1.59.1`),
+since with a caret a fresh clone can resolve past the browsers on its own.
+
+To bump them together deliberately, move the npm side to whatever the check
+reports:
+
+```sh
+pnpm add -D @playwright/test@<version the check printed>
 ```
 
 ## The suites

@@ -79,7 +79,9 @@ nix develop .#playwright -c pnpm test:e2e
 The browsers come from nixpkgs via the `playwright` dev shell rather than from
 `playwright install`, and CI uses the same shell, so both drive the same binary.
 `@playwright/test` is therefore pinned exactly (no caret) to the version nixpkgs
-ships — bump the two together. See [`e2e-tests/README.md`](e2e-tests/README.md)
+ships — bump the two together, and `pnpm check:playwright-pin` (which CI runs
+before the suite) fails with the reconciling command if you don't. See
+[`e2e-tests/README.md`](e2e-tests/README.md)
 for that, for the conventions the specs follow, and for how to run one file or
 step through a failure.
 

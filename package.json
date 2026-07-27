@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
+    "check:playwright-pin": "./scripts/check-playwright-pin.sh",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
