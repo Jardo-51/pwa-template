@@ -37,8 +37,16 @@ pnpm test:e2e:report                                    # last HTML report
 whatever is already answering there (`reuseExistingServer`). If another project
 on this machine — say one derived from this template — left a preview server on
 that port, a run silently drives *that* app instead, and every locator fails
-with "element(s) not found" against a page you did not build. Check with
-`ss -ltnp | grep 4173` when a run fails that way.
+with "element(s) not found" against a page you did not build. Reuse also skips
+`pnpm build`, so a preview server left over from an hour ago gives you a green
+run against a **stale bundle** — and that one does not announce itself at all.
+Check with `ss -ltnp | grep 4173` when a run fails that way.
+
+Move out of the way with `E2E_PORT`, rather than editing tracked config:
+
+```sh
+E2E_PORT=4273 nix develop .#playwright -c pnpm test:e2e
+```
 
 ### Keeping the versions in step
 

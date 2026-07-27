@@ -1,7 +1,16 @@
 import process from 'node:process'
 import { defineConfig } from '@playwright/test'
 
-const PORT = 4173
+// `reuseExistingServer` below means whatever already answers on this port is
+// what the suite drives — including a stale preview of another project derived
+// from this template, which every fork ships on the same 4173. Override rather
+// than edit this file when that happens:
+//
+//     E2E_PORT=4273 pnpm test:e2e
+//
+// `--strictPort` is the other half of it: vite fails loudly instead of quietly
+// bumping to a port nothing is pointed at.
+const PORT = Number(process.env.E2E_PORT ?? 4173)
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
 /**
