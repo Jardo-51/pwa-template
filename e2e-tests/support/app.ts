@@ -63,8 +63,21 @@ export async function serviceWorkerReady (page: Page) {
 
 /**
  * Snackbars sit over the bottom of the screen, where the nav is, and swallow
- * the clicks aimed at it. Resolves immediately when none is showing, which is
- * why the helpers below can call it unconditionally.
+ * the clicks aimed at it. Clears one that is **already on screen**.
+ *
+ * Call it only where a snackbar is up or is definitely never coming — which is
+ * every caller below, because nothing in `src/` calls the `showSnackbar` that
+ * `src/stores/app.ts` exports, so `.v-snackbar--active` never matches and this
+ * is a no-op in every current run. Not because the specs do not mutate: they
+ * do (`setDarkMode`), it just does not raise a message today.
+ *
+ * It is not a guard against one that has yet to mount:
+ * `waitFor({ state: 'detached' })` is satisfied the instant the locator matches
+ * nothing, so `doSomethingThatSnacks(); await settle(); await navigate()`
+ * returns *before* the snackbar appears and then clicks straight into it. The
+ * first action wired up to `showSnackbar` breaks that invariant, and the spec
+ * driving it has to wait for the snackbar to become visible before calling
+ * this.
  *
  * Dismissed rather than waited out where that is possible: the message would
  * otherwise stay up for its full timeout and a suite that shows one in most of

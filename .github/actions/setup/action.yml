@@ -6,30 +6,26 @@ description: Install Nix and restore the pnpm store cache.
 # was duplicated verbatim, and the symptom of the two drifting is a cold cache
 # on one workflow only — slow rather than loud.
 
-inputs:
-  github_access_token:
-    description: >-
-      Token the Nix installer uses when it fetches flake inputs from GitHub,
-      which raises the anonymous API rate limit. Pass `secrets.GITHUB_TOKEN`;
-      a composite action cannot read the secrets context itself.
-    required: false
-    default: ''
-
 runs:
   using: composite
   steps:
+    # No `github_access_token:` here on purpose: the action already sets
+    # `GITHUB_TOKEN: ${{ github.token }}` in the installer's step env
+    # unconditionally, and `install-nix.sh` falls back to it for
+    # `access-tokens = github.com=…` when the input is empty. Passing
+    # `secrets.GITHUB_TOKEN` down from each workflow bought nothing and meant
+    # five places had to stay in step to keep it working.
     - name: Install Nix
       uses: cachix/install-nix-action@v31
       with:
         # Single-user install: the runner is one user with root, so the daemon
         # only adds setup time.
         install_options: --no-daemon
-        github_access_token: ${{ inputs.github_access_token }}
 
     # I experimented with caching the Nix store but it brought a performance penalty rather than benefit
 
     - name: Cache pnpm store
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.local/share/pnpm/store
         key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}

@@ -16,12 +16,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Build
         uses: ./.github/actions/build
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: nix develop --command bash -c "pnpm test"

@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref-overwrite || github.ref }}
 
@@ -25,7 +25,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           lint: 'false'
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup SSH
         env:

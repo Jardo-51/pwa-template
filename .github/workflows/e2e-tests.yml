@@ -21,9 +21,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
+    # A job-level block replaces the top-level one rather than adding to it, so
+    # `contents: read` is restated here for the checkout. `actions` is here for
+    # the cache purge below: it lists the repo's caches and DELETEs the
+    # superseded ones through the REST cache API, which needs `actions: write`
+    # (write covers the read the listing does). Without it every delete comes
+    # back 403 — and cache-nix-action logs that in the post step and leaves the
+    # job green, so the entries would keep piling up exactly as the comment on
+    # the cache step says they must not, and silently.
+    permissions:
+      contents: read
+      actions: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Nix + the pnpm store cache, shared with the Build workflow. This one
       # does not use `.github/actions/build` itself: it wants the Nix store
@@ -31,8 +43,6 @@ jobs:
       # redundant here — playwright's `webServer` builds the app anyway.
       - name: Set up toolchain
         uses: ./.github/actions/setup
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       # The browsers come from the playwright shell, so the whole store is
       # worth keeping between runs. Keyed on the flake, which is what decides
@@ -45,6 +55,32 @@ jobs:
         with:
           primary-key: nix-playwright-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
           restore-prefixes-first-match: nix-playwright-${{ runner.os }}-
+
+          # Bounded and self-purging, because this entry shares a 10 GB
+          # per-repo budget with the pnpm store cache that `.github/actions/setup`
+          # restores for *both* workflows. Every flake bump mints a new key and
+          # nothing ever removed the old ones, so a handful of them would evict
+          # the pnpm entry by LRU and quietly make both workflows slower —
+          # again slow rather than loud.
+          gc-max-store-size-linux: 2G
+          purge: true
+          purge-prefixes: nix-playwright-${{ runner.os }}-
+          # Every entry under that prefix except the one keyed for *this* run
+          # (`purge-primary-key: never` compares against `primary-key`, not
+          # against whatever `restore-prefixes-first-match` restored from). So
+          # on a flake bump the entry this run restored from is purged too —
+          # which is the point: it is the superseded one.
+          #
+          # `purge-created: 0` is "created more than 0 seconds ago", i.e. no
+          # grace period. A time bound is the wrong tool here: a week of flake
+          # bumps parks several ~2 GB entries against the shared budget, which
+          # is the accumulation the paragraph above is about.
+          #
+          # Purging is scoped to the current `GITHUB_REF` (the action passes it
+          # to the delete call), so it is the `push: main` runs that keep the
+          # shared entries in check — a PR run only tidies its own.
+          purge-created: 0
+          purge-primary-key: never
 
       - name: Install
         run: nix develop --command bash -c "pnpm install --frozen-lockfile"

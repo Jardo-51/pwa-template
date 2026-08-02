@@ -50,28 +50,20 @@ E2E_PORT=4273 nix develop .#playwright -c pnpm test:e2e
 
 ### Keeping the versions in step
 
-`playwright-driver.browsers` pins one set of browser revisions, and
+`playwright-driver.browsers` pins one set of browser revisions and
 `@playwright/test` in `package.json` is pinned exactly (no caret) to match.
-Nothing in the package manager knows about that coupling, so a routine
-`pnpm update -L` — or a bump of the nixpkgs branch in `flake.lock` — moves one
-side and not the other. The symptom is a launch failing with *"Executable
-doesn't exist"*, which names neither the pin nor the flake and sends people to
-`playwright install`, "fixing" it locally while leaving CI broken.
-
-`scripts/check-playwright-pin.sh` is the guard for that. It reads the installed
-package version and the driver version out of the flake's own locked input, and
-fails with the command that reconciles them:
+Nothing in the package manager knows about that coupling, so
+`scripts/check-playwright-pin.sh` is the guard for it — its header explains the
+failure mode it exists to catch, and it rejects both a drifted version and a
+range spec:
 
 ```sh
 pnpm check:playwright-pin
 ```
 
 CI runs it in `e2e-tests.yml` **before** the suite, so the diagnosis arrives
-ahead of the failure it explains. It also rejects a range spec (`^1.59.1`),
-since with a caret a fresh clone can resolve past the browsers on its own.
-
-To bump them together deliberately, move the npm side to whatever the check
-reports:
+ahead of the failure it explains. To bump the two sides together deliberately,
+move the npm side to whatever the check reports:
 
 ```sh
 pnpm add -D @playwright/test@<version the check printed>
@@ -82,24 +74,13 @@ pnpm add -D @playwright/test@<version the check printed>
 The template ships the two suites that are about the template itself rather than
 about any app built on it, so both stay useful after you delete the demo pages.
 
-`pwa.spec.ts` is the one file about the service worker: the network goes down
-and the app still reloads, keeps its stored settings, routes between its
-lazily-loaded pages and answers a cold `/settings` — and a cold unknown path —
-out of workbox's navigate fallback. Every assertion in it passes with the worker
-deleted as long as the network is up, which is why it cuts it. It is the test
-worth keeping green as an app grows: what it catches is a `globPatterns` change
-that leaves the app booting fine on a warm network and dead on a train.
+What each one covers, and what it deliberately does not, is in its own docblock
+— that is where it stays in step with the assertions. In outline:
 
-It does *not* cover the web app manifest — nothing fetches
-`manifest.webmanifest` or checks installability, and `globPatterns` in
-`vite.config.mts` does not list that extension — so a broken `start_url` or a
-dropped icon passes silently. Fetching the manifest while offline and asserting
-on it would be a good first addition.
-
-`settings.spec.ts` is the theme: the switch in Settings, that the choice
-survives a reload (it lives in localStorage, so the reload *is* the test), and
-`stores/app.ts`'s other half — the OS colour scheme is followed until the user
-picks a theme, and stops being followed the moment they do.
+- `pwa.spec.ts` — the service worker: the app with the network cut. The one
+  worth keeping green as an app grows.
+- `settings.spec.ts` — the theme: the switch, the reload that proves it is read
+  back, and the OS colour scheme the app follows until the user chooses.
 
 ## Conventions
 
@@ -116,9 +97,11 @@ These are what the two suites follow, and what a new one should.
   means waiting for the thing on screen that says it happened, not for a
   plausible number of seconds to pass.
 - **Snackbars sit over the bottom nav and swallow clicks aimed at it** — the
-  helpers call `settle()` before navigating, which returns at once when there is
-  no snackbar up. Where there is one, it clicks the message's Close button
-  rather than waiting the timeout out.
+  helpers call `settle()` before navigating. It clears a snackbar that is
+  already on screen (clicking the message's Close button rather than waiting the
+  timeout out) and returns at once when there is none, so after a *mutating*
+  action wait for the snackbar to appear before calling it — otherwise it
+  returns before the thing it is meant to wait for exists.
 - **Match names with `exact: true`.** Playwright matches an accessible name as a
   case-insensitive substring by default, so `getByRole('link', { name: 'Home' })`
   also finds the not-found page's *Go home* button.

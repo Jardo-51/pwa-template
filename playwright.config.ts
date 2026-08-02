@@ -11,6 +11,14 @@ import { defineConfig } from '@playwright/test'
 // `--strictPort` is the other half of it: vite fails loudly instead of quietly
 // bumping to a port nothing is pointed at.
 const PORT = Number(process.env.E2E_PORT ?? 4173)
+// Checked rather than trusted: `Number('427e')` is NaN, not an error, and the
+// only symptom would be the `webServer` wait timing out after 180 s against
+// `http://127.0.0.1:NaN` — a failure that names neither the variable nor the
+// typo. This is the knob people reach for when a run is already misbehaving,
+// so it has to fail in a way that points at itself.
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65_535) {
+  throw new Error(`E2E_PORT must be a port number, got '${process.env.E2E_PORT}'.`)
+}
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
 /**
@@ -21,13 +29,9 @@ const BASE_URL = `http://127.0.0.1:${PORT}`
  *
  *     nix develop .#playwright -c pnpm test:e2e
  *
- * The shell exports `PLAYWRIGHT_BROWSERS_PATH` at the nixpkgs
- * `playwright-driver.browsers` derivation, which pins one set of browser
- * revisions. `@playwright/test` is therefore pinned exactly (no caret) to the
- * matching version — bump the two together, or a launch fails with
- * "Executable doesn't exist". Check what nixpkgs has with:
- *
- *     nix eval --raw 'github:NixOS/nixpkgs/nixos-26.05#playwright-driver.version'
+ * That shell pins one set of browser revisions, so `@playwright/test` is
+ * pinned exactly (no caret) to match; `pnpm check:playwright-pin` is what
+ * verifies the two are still in step, and its script says why.
  *
  * See e2e-tests/README.md.
  */
