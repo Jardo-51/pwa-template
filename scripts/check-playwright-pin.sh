@@ -50,7 +50,11 @@ failed=false
 # rejects `^1.59.1` and `~1.59.1` but passes `1.59.x`, `1.x` and
 # `1.59.1 || 2.0.0`, which are ranges too and can resolve past the pinned
 # browsers on a fresh clone just the same.
-if [[ ! $spec =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+#
+# Prerelease and build metadata are separate optional groups, in that order:
+# one group spanning both would have to admit `+` inside the prerelease, and
+# then `1.2.3-rc.1+build.5` — exact, and legal semver — reads as a range.
+if [[ ! $spec =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
   echo "The @playwright/test spec is '$spec', which is not an exact version." >&2
   echo "Set it to one (no ^, ~, x or ||) in package.json." >&2
   failed=true
