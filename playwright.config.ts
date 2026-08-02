@@ -11,6 +11,14 @@ import { defineConfig } from '@playwright/test'
 // `--strictPort` is the other half of it: vite fails loudly instead of quietly
 // bumping to a port nothing is pointed at.
 const PORT = Number(process.env.E2E_PORT ?? 4173)
+// Checked rather than trusted: `Number('427e')` is NaN, not an error, and the
+// only symptom would be the `webServer` wait timing out after 180 s against
+// `http://127.0.0.1:NaN` — a failure that names neither the variable nor the
+// typo. This is the knob people reach for when a run is already misbehaving,
+// so it has to fail in a way that points at itself.
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65_535) {
+  throw new Error(`E2E_PORT must be a port number, got '${process.env.E2E_PORT}'.`)
+}
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
 /**
