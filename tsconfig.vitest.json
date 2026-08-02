@@ -1,9 +1,22 @@
 {
   "extends": "./tsconfig.app.json",
-  // Broad include on purpose: this composite project has no `references`, so it
-  // must list every file the tests reach (App.vue, the router, stores, …).
-  // Narrowing to `src/**/__tests__/*` (the create-vue default) makes `vue-tsc
-  // --build` fail with TS6307 on each of those transitively imported files.
+  // Duplicate compilation, accepted. This composite project has no
+  // `references`, so it must list every file the tests reach (App.vue, the
+  // router, the stores, …) — narrowing to `src/**/__tests__/*` (the create-vue
+  // default) makes `vue-tsc --build` fail with TS6307 on each of those
+  // transitively imported files. The cost is that all of `src/` is checked
+  // twice per `pnpm build`: once here and once by tsconfig.app.json, which
+  // excludes the tests.
+  //
+  // The standard fix is a project reference, and it is available: give
+  // tsconfig.app.json `emitDeclarationOnly` + a `declarationDir` (a referenced
+  // project may not disable emit), or split the shared sources into their own
+  // emitting composite project that both `app` and `vitest` reference. Not done
+  // here because the cost was measured and is small — the whole
+  // `vue-tsc --build --force` across all four projects is ~13 s on a template
+  // this size — while the surgery changes what the *app* build emits for the
+  // benefit of the test project. Revisit if `src/` grows enough for the second
+  // pass to be felt.
   "include": ["src/**/*", "src/**/*.vue"],
   "exclude": [],
   "compilerOptions": {
