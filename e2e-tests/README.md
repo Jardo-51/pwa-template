@@ -97,9 +97,11 @@ These are what the two suites follow, and what a new one should.
   means waiting for the thing on screen that says it happened, not for a
   plausible number of seconds to pass.
 - **Snackbars sit over the bottom nav and swallow clicks aimed at it** — the
-  helpers call `settle()` before navigating, which returns at once when there is
-  no snackbar up. Where there is one, it clicks the message's Close button
-  rather than waiting the timeout out.
+  helpers call `settle()` before navigating. It clears a snackbar that is
+  already on screen (clicking the message's Close button rather than waiting the
+  timeout out) and returns at once when there is none, so after a *mutating*
+  action wait for the snackbar to appear before calling it — otherwise it
+  returns before the thing it is meant to wait for exists.
 - **Match names with `exact: true`.** Playwright matches an accessible name as a
   case-insensitive substring by default, so `getByRole('link', { name: 'Home' })`
   also finds the not-found page's *Go home* button.

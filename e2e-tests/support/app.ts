@@ -63,8 +63,16 @@ export async function serviceWorkerReady (page: Page) {
 
 /**
  * Snackbars sit over the bottom of the screen, where the nav is, and swallow
- * the clicks aimed at it. Resolves immediately when none is showing, which is
- * why the helpers below can call it unconditionally.
+ * the clicks aimed at it. Clears one that is **already on screen**.
+ *
+ * Call it only where a snackbar is up or is definitely never coming — which is
+ * every caller below, since none of the specs so far mutates anything. It is
+ * not a guard against one that has yet to mount: `waitFor({ state: 'detached' })`
+ * is satisfied the instant the locator matches nothing, so
+ * `doSomethingThatSnacks(); await settle(); await navigate()` returns *before*
+ * the snackbar appears and then clicks straight into it. A spec that follows a
+ * mutating action has to wait for the snackbar to become visible first, and
+ * only then call this.
  *
  * Dismissed rather than waited out where that is possible: the message would
  * otherwise stay up for its full timeout and a suite that shows one in most of
