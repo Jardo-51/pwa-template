@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Nix + the pnpm store cache, shared with the Build workflow. This one
       # does not use `.github/actions/build` itself: it wants the Nix store
