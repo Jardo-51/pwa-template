@@ -25,6 +25,13 @@ import {
  * about it.
  */
 test.describe('the dark mode switch', () => {
+  // Explicit rather than relying on Playwright's default: with nothing stored,
+  // the first assertion below resolves through `prefers-color-scheme`. Stating
+  // it keeps a `colorScheme` added to `use` in playwright.config.ts — or a
+  // Playwright default change — from reading as "dark mode is on when it
+  // shouldn't be" rather than as the harness moving.
+  test.use({ colorScheme: 'light' })
+
   test('turns dark mode on, and comes back dark after a reload', async ({ page }) => {
     await openApp(page)
     await openSettings(page)
