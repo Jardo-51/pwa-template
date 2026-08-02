@@ -20,8 +20,6 @@ jobs:
 
       - name: Build
         uses: ./.github/actions/build
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: nix develop --command bash -c "pnpm test"

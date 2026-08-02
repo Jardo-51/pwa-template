@@ -25,7 +25,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           lint: 'false'
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup SSH
         env:

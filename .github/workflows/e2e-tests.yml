@@ -31,8 +31,6 @@ jobs:
       # redundant here — playwright's `webServer` builds the app anyway.
       - name: Set up toolchain
         uses: ./.github/actions/setup
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       # The browsers come from the playwright shell, so the whole store is
       # worth keeping between runs. Keyed on the flake, which is what decides
