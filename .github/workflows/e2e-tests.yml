@@ -65,9 +65,21 @@ jobs:
           gc-max-store-size-linux: 2G
           purge: true
           purge-prefixes: nix-playwright-${{ runner.os }}-
-          # Superseded entries only: the key we just restored from is kept
-          # (`purge-primary-key: never`), and anything older than a week goes.
-          purge-created: 604800
+          # Every entry under that prefix except the one keyed for *this* run
+          # (`purge-primary-key: never` compares against `primary-key`, not
+          # against whatever `restore-prefixes-first-match` restored from). So
+          # on a flake bump the entry this run restored from is purged too —
+          # which is the point: it is the superseded one.
+          #
+          # `purge-created: 0` is "created more than 0 seconds ago", i.e. no
+          # grace period. A time bound is the wrong tool here: a week of flake
+          # bumps parks several ~2 GB entries against the shared budget, which
+          # is the accumulation the paragraph above is about.
+          #
+          # Purging is scoped to the current `GITHUB_REF` (the action passes it
+          # to the delete call), so it is the `push: main` runs that keep the
+          # shared entries in check — a PR run only tidies its own.
+          purge-created: 0
           purge-primary-key: never
 
       - name: Install
