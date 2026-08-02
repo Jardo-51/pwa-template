@@ -21,6 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
+    # A job-level block replaces the top-level one rather than adding to it, so
+    # `contents: read` is restated here for the checkout. `actions` is here for
+    # the cache purge below: it lists the repo's caches and DELETEs the
+    # superseded ones through the REST cache API, which needs `actions: write`
+    # (write covers the read the listing does). Without it every delete comes
+    # back 403 — and cache-nix-action logs that in the post step and leaves the
+    # job green, so the entries would keep piling up exactly as the comment on
+    # the cache step says they must not, and silently.
+    permissions:
+      contents: read
+      actions: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
