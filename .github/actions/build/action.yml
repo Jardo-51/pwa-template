@@ -3,7 +3,7 @@ description: Install Nix + pnpm, restore the pnpm store cache, and build the app
 
 inputs:
   lint:
-    description: Run `pnpm lint` before building.
+    description: Set to `'false'` to skip `pnpm lint` before building.
     default: 'true'
   github_access_token:
     description: Passed straight through to `.github/actions/setup`.
@@ -28,6 +28,10 @@ runs:
         nix develop --command bash -c '
           set -e
           pnpm install --frozen-lockfile
-          if [ "$RUN_LINT" = true ]; then pnpm lint; fi
+          # Tested against `false`, not `true`, so the gate fails *closed*: only
+          # Deploy ever wants lint off, and it passes the exact string. A typo
+          # in any other value (`True`, `1`, `yes`) then still lints, instead of
+          # silently skipping it and going green for the wrong reason.
+          if [ "$RUN_LINT" != false ]; then pnpm lint; fi
           pnpm build
         '
